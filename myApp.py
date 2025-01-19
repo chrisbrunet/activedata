@@ -111,7 +111,6 @@ if st.session_state.data is None:
 
 formatted_data = format_data(st.session_state.data)
 
-
 with st.form("filters"):
     sport_types = formatted_data['Sport Type'].unique()
     sport_type = st.selectbox("Sport Type", sport_types)
