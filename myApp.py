@@ -3,6 +3,7 @@ import pandas as pd
 import requests
 import matplotlib.pyplot as plt
 import seaborn as sns
+from datetime import datetime
 
 st.set_page_config(layout="wide")
 
@@ -14,8 +15,8 @@ column_rename_map = {
         "total_elevation_gain": "Elevation Gain (m)",
         "sport_type": "Sport Type",
         "start_date_local": "Start Date",
-        "average_speed": "Average Speed (m/s)",
-        "max_speed": "Max Speed (m/s)",
+        "average_speed": "Average Speed (km/h)",
+        "max_speed": "Max Speed (km/h)",
         "average_cadence": "Average Cadence (rpm)",
         "average_watts": "Average Watts",
         "max_watts": "Max Watts",
@@ -90,6 +91,12 @@ def format_data(df):
     columns_to_keep = column_rename_map.keys()
     df = df[columns_to_keep]
     df = df.rename(columns=column_rename_map)
+
+    df['Distance (km)'] = df['Distance (km)']/1000
+    df['Average Speed (km/h)'] = df['Average Speed (km/h)']*3.6
+    df['Max Speed (km/h)'] = df['Max Speed (km/h)']*3.
+    df['Start Date'] = pd.to_datetime(df['Start Date']).dt.date
+
     return df
 
 def plot_histogram(column_name):
@@ -114,8 +121,17 @@ formatted_data = format_data(st.session_state.data)
 with st.form("filters"):
     sport_types = formatted_data['Sport Type'].unique()
     sport_type = st.selectbox("Sport Type", sport_types)
-
     filtered_df = formatted_data[formatted_data['Sport Type'] == sport_type]
+
+    start_date_default = filtered_df['Start Date'].min()
+    col1, col2 = st.columns(2)
+    with col1:
+        start_date = st.date_input("Start Date", start_date_default)
+    with col2:
+        end_date = st.date_input("End Date")
+        
+    filtered_df = filtered_df[(filtered_df['Start Date'] >= start_date) & (filtered_df['Start Date'] <= end_date)]
+
     st.form_submit_button("Submit")
 
 col1, col2, col3 = st.columns(3)
@@ -124,7 +140,7 @@ with col1:
     plot_histogram("Distance (km)")
 
 with col2:
-    plot_histogram("Average Speed (m/s)")
+    plot_histogram("Average Speed (km/h)")
 
 with col3: 
     plot_histogram("Elevation Gain (m)")
