@@ -3,7 +3,6 @@ import pandas as pd
 import requests
 import matplotlib.pyplot as plt
 import seaborn as sns
-from datetime import datetime
 
 st.set_page_config(layout="wide")
 
@@ -88,6 +87,9 @@ def get_activity_data(access_token):
     return all_activities_df
 
 def format_data(df):
+    # Change sport type for all commute rides
+    df.loc[df['commute'] == True, 'sport_type'] = 'Commute'
+
     columns_to_keep = column_rename_map.keys()
     df = df[columns_to_keep]
     df = df.rename(columns=column_rename_map)
@@ -118,6 +120,7 @@ if st.session_state.data is None:
         access_token = request_access_token(client_id, client_secret, refresh_token)
         st.session_state.data = get_activity_data(access_token)
 
+# st.write(st.session_state.data)
 formatted_data = format_data(st.session_state.data)
 
 with st.form("filters"):
@@ -175,7 +178,7 @@ with st.container(border=True):
         st.metric("Average Speed (km/h)", round(avg_speed))
 
 # GRAPHS
-with st.container(border=True):
+with st.expander("Graphs"):
     col1, col2, col3 = st.columns(3)
 
     with col1:
@@ -187,7 +190,16 @@ with st.container(border=True):
     with col3: 
         plot_histogram("Average Speed (km/h)")
 
+# MAP
+with st.expander("Map"):
+    st.write("Coming soon...")
+    
+# MEDIA
+with st.expander("Media"):
+    st.write("Coming soon...")
+
 # ALL DATA TABLE
-st.write(filtered_df)
+with st.expander("Activities Info"):
+    st.write(filtered_df)
 
 
