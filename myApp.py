@@ -3,6 +3,8 @@ import pandas as pd
 import requests
 import matplotlib.pyplot as plt
 import seaborn as sns
+import pydeck as pdk
+import polyline
 
 st.set_page_config(layout="wide")
 
@@ -101,8 +103,20 @@ def format_data(df):
 
     return df
 
+def get_polylines(df):
+    rows = []
+    for index, row in df.iterrows():
+        map_data = pd.DataFrame([row['map']])
+        polylines = map_data["summary_polyline"].values
+        coordinates = polyline.decode(polylines[0])
+        for coord in coordinates:
+            rows.append({"name": map_data["id"].values, "latitude": coord[0], "longitude": coord[1]})
+
+    polylines_df = pd.DataFrame(rows)
+    return polylines_df
+
 def plot_histogram(column_name):
-    plt.figure(figsize=(10, 6))
+    plt.figure(figsize=(5, 3))
     sns.histplot(filtered_df[column_name], bins=30, kde=True, color="blue")
     plt.xlabel(column_name)
     plt.ylabel("")  # Remove the y-axis label
@@ -192,8 +206,29 @@ with st.expander("Graphs"):
 
 # MAP
 with st.expander("Map"):
-    st.write("Coming soon...")
-    
+
+    polylines = get_polylines(st.session_state.data)
+    st.write(polylines)
+
+    # point_layer = pdk.Layer(
+    #     "ScatterplotLayer",
+    #     data=polylines,
+    #     id="name",
+    #     get_position=["longitude", "latitude"],
+    #     get_color="[255, 75, 75]",
+    #     pickable=True,
+    #     auto_highlight=True,
+    #     get_radius=100,
+    # )
+
+    # view_state = pdk.ViewState(
+    #     latitude=40, longitude=-117, controller=True, zoom=2.4, pitch=30
+    # )
+
+    # chart = pdk.Deck(point_layer, initial_view_state=view_state)
+
+    # event = st.pydeck_chart(chart)  
+
 # MEDIA
 with st.expander("Media"):
     st.write("Coming soon...")
