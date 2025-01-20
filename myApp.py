@@ -111,6 +111,8 @@ client_id = st.secrets.CLIENT_ID
 client_secret = st.secrets.CLIENT_SECRET
 refresh_token = st.secrets.REFRESH_TOKEN
 
+st.header("Strava Data Analyzer")
+
 if st.session_state.data is None:
     with st.spinner("Getting Data..."):
         access_token = request_access_token(client_id, client_secret, refresh_token)
@@ -119,9 +121,14 @@ if st.session_state.data is None:
 formatted_data = format_data(st.session_state.data)
 
 with st.form("filters"):
-    sport_types = formatted_data['Sport Type'].unique()
+    sport_types = formatted_data['Sport Type'].unique().tolist()
+    sport_types.insert(0, "All")
     sport_type = st.selectbox("Sport Type", sport_types)
-    filtered_df = formatted_data[formatted_data['Sport Type'] == sport_type]
+
+    if sport_type == "All":
+        filtered_df = formatted_data
+    else:
+        filtered_df = formatted_data[formatted_data['Sport Type'] == sport_type]
 
     start_date_default = filtered_df['Start Date'].min()
     col1, col2 = st.columns(2)
@@ -134,20 +141,53 @@ with st.form("filters"):
 
     st.form_submit_button("Submit")
 
-col1, col2, col3 = st.columns(3)
+# TOTALS CONTAINER
+with st.container(border=True):
 
-with col1:
-    plot_histogram("Distance (km)")
+    col1, col2, col3, col4 = st.columns(4)
 
-with col2:
-    plot_histogram("Average Speed (km/h)")
+    with col1:
+        total_activities = filtered_df["Name"].count()
+        total_time = filtered_df["Moving Time (s)"].sum()
 
-with col3: 
-    plot_histogram("Elevation Gain (m)")
+        st.metric("Total Activities", total_activities)
+        st.metric("Total Time (hrs)", round(total_time/60, 1))
 
-if filtered_df is not None:
-    st.write(filtered_df)
-else:
-    st.write(formatted_data)
+    with col2:
+        total_dist = filtered_df["Distance (km)"].sum()
+        avg_dist = filtered_df["Distance (km)"].mean()
+
+        st.metric("Total Distance (km)", round(total_dist, 2))
+        st.metric("Average Distance", round(avg_dist, 2))
+
+    with col3:
+        total_elevation = filtered_df["Elevation Gain (m)"].sum()
+        avg_elevation = filtered_df["Elevation Gain (m)"].mean()
+
+        st.metric("Total Elevation (m)", round(total_elevation, 2))
+        st.metric("Average Elevation (m)", round(avg_elevation, 2))
+
+    with col4:
+        max_speed = filtered_df["Max Speed (km/h)"].max()
+        avg_speed = filtered_df["Average Speed (km/h)"].mean()
+
+        st.metric("Max Speed (km/h)", round(max_speed, 2))
+        st.metric("Average Speed (km/h)", round(avg_speed))
+
+# GRAPHS
+with st.container(border=True):
+    col1, col2, col3 = st.columns(3)
+
+    with col1:
+        plot_histogram("Distance (km)")
+
+    with col2:
+        plot_histogram("Elevation Gain (m)")
+
+    with col3: 
+        plot_histogram("Average Speed (km/h)")
+
+# ALL DATA TABLE
+st.write(filtered_df)
 
 
