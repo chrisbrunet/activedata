@@ -11,6 +11,7 @@ if 'data' not in st.session_state:
 client_id = st.secrets.CLIENT_ID
 client_secret = st.secrets.CLIENT_SECRET
 refresh_token = st.secrets.REFRESH_TOKEN
+connection_string = st.secrets.CONNECTION_STRING
 
 st.header("Strava Data Analyzer")
 
@@ -22,6 +23,9 @@ if st.session_state.data is None:
 # st.write(st.session_state.data)
 formatted_data = dutil.format_data(st.session_state.data)
 
+media_data = dutil.get_collection(connection_string, "activity_media")
+
+# FILTERS SIDEBAR
 with st.sidebar:
     sport_types = formatted_data['Sport Type'].unique().tolist()
     sport_types.insert(0, "All")
@@ -51,7 +55,7 @@ with st.container(border=True):
         total_time = filtered_df["Moving Time (s)"].sum()
 
         st.metric("Total Activities", total_activities)
-        st.metric("Total Time (hrs)", round(total_time/60, 1))
+        st.metric("Total Time (hrs)", round(total_time/60/60, 1))
 
     with col2:
         total_dist = filtered_df["Distance (km)"].sum()
