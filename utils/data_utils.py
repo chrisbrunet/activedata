@@ -7,6 +7,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 from utils.data_mappings import column_rename_map
 
+@st.cache_resource
 def request_access_token(client_id, client_secret, refresh_token):
     """
     Post request to refresh and get new API access token
@@ -33,6 +34,7 @@ def request_access_token(client_id, client_secret, refresh_token):
     print(f"\nAccess Token = {access_token}")
     return access_token
 
+@st.cache_resource(ttl=600)
 def get_activity_data(access_token):
     """
     Get request for Strava user activity data 
