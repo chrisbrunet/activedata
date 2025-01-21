@@ -22,7 +22,7 @@ if st.session_state.data is None:
 # st.write(st.session_state.data)
 formatted_data = dutil.format_data(st.session_state.data)
 
-with st.form("filters"):
+with st.sidebar:
     sport_types = formatted_data['Sport Type'].unique().tolist()
     sport_types.insert(0, "All")
     sport_type = st.selectbox("Sport Type", sport_types)
@@ -40,8 +40,6 @@ with st.form("filters"):
         end_date = st.date_input("End Date")
         
     filtered_df = filtered_df[(filtered_df['Start Date'] >= start_date) & (filtered_df['Start Date'] <= end_date)]
-
-    st.form_submit_button("Submit")
 
 # TOTALS CONTAINER
 with st.container(border=True):
