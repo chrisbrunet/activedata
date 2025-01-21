@@ -3,5 +3,3 @@ pandas
 matplotlib
 requests
 seaborn
-polyline
-streamlit-geolocation
