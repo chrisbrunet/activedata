@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import pydeck as pdk
 import polyline
+from streamlit_geolocation import streamlit_geolocation
 
 st.set_page_config(layout="wide")
 
@@ -26,6 +27,7 @@ column_rename_map = {
         "max_heartrate": "Max Heart Rate (bpm)",
         "elev_high": "Max Elevation (m)",
         "elev_low": "Min Elevation (m)",
+        "map": "Map",
     }
 
 if 'data' not in st.session_state:
@@ -106,18 +108,32 @@ def format_data(df):
 def get_polylines(df):
     rows = []
     for index, row in df.iterrows():
-        map_data = pd.DataFrame([row['map']])
+        map_data = pd.DataFrame([row['Map']])
         polylines = map_data["summary_polyline"].values
         coordinates = polyline.decode(polylines[0])
         for coord in coordinates:
             rows.append({"name": map_data["id"].values, "latitude": coord[0], "longitude": coord[1]})
 
     polylines_df = pd.DataFrame(rows)
-    return polylines_df
 
-def plot_histogram(column_name):
+    polylines_df["name"] = polylines_df["name"].apply(lambda x: x[0])
+
+    polylines_transformed = (
+        polylines_df.groupby("name")
+        .apply(
+            lambda group: pd.DataFrame({
+                "name": group["name"].iloc[:-1], 
+                "start": group[["longitude", "latitude"]].values[:-1].tolist(),
+                "end": group[["longitude", "latitude"]].values[1:].tolist(), 
+            })
+        )
+        .reset_index(drop=True)
+    )
+    return polylines_transformed
+
+def plot_histogram(column_name, bins):
     plt.figure(figsize=(5, 3))
-    sns.histplot(filtered_df[column_name], bins=30, kde=True, color="blue")
+    sns.histplot(filtered_df[column_name], bins=bins, kde=True, color="blue")
     plt.xlabel(column_name)
     plt.ylabel("")  # Remove the y-axis label
     plt.gca().axes.get_yaxis().set_visible(False)  # Hide the y-axis
@@ -193,41 +209,51 @@ with st.container(border=True):
 
 # GRAPHS
 with st.expander("Graphs"):
+
+    bins = total_activities // 3
     col1, col2, col3 = st.columns(3)
 
     with col1:
-        plot_histogram("Distance (km)")
+        plot_histogram("Distance (km)", bins)
 
     with col2:
-        plot_histogram("Elevation Gain (m)")
+        plot_histogram("Elevation Gain (m)", bins)
 
     with col3: 
-        plot_histogram("Average Speed (km/h)")
+        plot_histogram("Average Speed (km/h)", bins)
 
 # MAP
 with st.expander("Map"):
 
-    polylines = get_polylines(st.session_state.data)
-    st.write(polylines)
+    st.write("Click to use current location:")
+    location = streamlit_geolocation()
+    polylines = get_polylines(filtered_df)
 
-    # point_layer = pdk.Layer(
-    #     "ScatterplotLayer",
-    #     data=polylines,
-    #     id="name",
-    #     get_position=["longitude", "latitude"],
-    #     get_color="[255, 75, 75]",
-    #     pickable=True,
-    #     auto_highlight=True,
-    #     get_radius=100,
-    # )
+    line_layer = pdk.Layer(
+        "LineLayer",
+        data=polylines,
+        get_source_position="start",
+        get_target_position="end",
+        get_width=5, 
+        get_color=[255, 0, 0], 
+        highlight_color=[255, 255, 0],
+        picking_radius=10,
+        auto_highlight=True,
+        pickable=True,
+    )
 
-    # view_state = pdk.ViewState(
-    #     latitude=40, longitude=-117, controller=True, zoom=2.4, pitch=30
-    # )
+    if location["latitude"] is None:
+         view_state = pdk.ViewState(
+            latitude=0, longitude=0, controller=True, zoom=2,
+        )
+    else:
+        view_state = pdk.ViewState(
+            latitude=location["latitude"], longitude=location["longitude"], controller=True, zoom=9,
+        )
 
-    # chart = pdk.Deck(point_layer, initial_view_state=view_state)
+    chart = pdk.Deck(layers=line_layer, initial_view_state=view_state)
 
-    # event = st.pydeck_chart(chart)  
+    event = st.pydeck_chart(chart)  
 
 # MEDIA
 with st.expander("Media"):
