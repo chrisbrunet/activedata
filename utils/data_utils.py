@@ -55,7 +55,7 @@ def get_activity_data(access_token):
     all_activities_list = []
     
     while True: # since max 200 activities can be accessed per request, while loop runs until all activities are loaded
-        param = {'per_page': 500, 'page': request_page_num}
+        param = {'per_page': 200, 'page': request_page_num}
         get_activities = requests.get(activities_url, headers=header,params=param).json()
         if len(get_activities) == 0: # exit condition
             break
