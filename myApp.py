@@ -1,5 +1,6 @@
 import streamlit as st
 import pydeck as pdk
+import pandas as pd
 from utils import data_utils as dutil
 from streamlit_geolocation import streamlit_geolocation
 
@@ -22,8 +23,6 @@ if st.session_state.data is None:
 
 # st.write(st.session_state.data)
 formatted_data = dutil.format_data(st.session_state.data)
-
-media_data = dutil.get_collection(connection_string, "activity_media")
 
 # FILTERS SIDEBAR
 with st.sidebar:
@@ -134,7 +133,34 @@ with st.expander("Map"):
 
 # MEDIA
 with st.expander("Media"):
-    st.write("Coming soon...")
+
+    media_collection = dutil.get_collection(connection_string, "activity_media")
+    media_data = pd.DataFrame(media_collection.find({}))
+    st.write(media_data)
+
+    strava_data_media = formatted_data[
+        (formatted_data["Photos"] > 0) & \
+        (formatted_data["Sport Type"] != "VirtualRide") & \
+        (formatted_data["Sport Type"] != "VirtualRun") & \
+        (formatted_data["Sport Type"] != "Rowing")
+        ]
+    strava_data_media.drop(columns=["Start Date"], inplace=True)
+
+    new_strava_media = media_data[~media_data['Activity ID'].isin(strava_data_media['Activity ID'])]
+
+    if not new_strava_media.empty:
+        print("New Media Found")
+        print(new_strava_media)
+        data_to_insert = new_strava_media.to_dict(orient='records')
+        try:
+            media_collection.insert_many(data_to_insert)
+            print("Data successfully inserted into media_collection.")
+        except Exception as e:
+            print(f"An error occurred while inserting data: {e}")
+    else:
+        print("No New Media Found")
+    
+
 
 # ALL DATA TABLE
 with st.expander("Activities Info"):

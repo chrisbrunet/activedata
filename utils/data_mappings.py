@@ -1,4 +1,5 @@
 column_rename_map = {
+        "id": "Activity ID",
         "name": "Name",
         "distance": "Distance (km)",
         "moving_time": "Moving Time (s)",
@@ -17,4 +18,5 @@ column_rename_map = {
         "elev_high": "Max Elevation (m)",
         "elev_low": "Min Elevation (m)",
         "map": "Map",
+        "total_photo_count": "Photos"
     }

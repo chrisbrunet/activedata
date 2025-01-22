@@ -34,7 +34,7 @@ def request_access_token(client_id, client_secret, refresh_token):
     print(f"\nAccess Token = {access_token}")
     return access_token
 
-@st.cache_resource(ttl=600)
+@st.cache_resource(ttl=600, show_spinner=False)
 def get_activity_data(access_token):
     """
     Get request for Strava user activity data 
@@ -63,6 +63,7 @@ def get_activity_data(access_token):
         print(f'\t- Activities: {len(all_activities_list) - len(get_activities)} to {len(all_activities_list)}')
         request_page_num += 1
     
+    print("\nFinished Getting Data")
     all_activities_df = pd.DataFrame(all_activities_list)
     return all_activities_df
 
