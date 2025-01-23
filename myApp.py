@@ -144,13 +144,16 @@ with st.expander("Media"):
         (formatted_data["Sport Type"] != "VirtualRun") & \
         (formatted_data["Sport Type"] != "Rowing")
         ]
-    strava_data_media.drop(columns=["Start Date"], inplace=True)
+    strava_data_media = strava_data_media.drop(columns=["Start Date"])
 
     new_strava_media = media_data[~media_data['Activity ID'].isin(strava_data_media['Activity ID'])]
 
     if not new_strava_media.empty:
-        print("New Media Found")
-        print(new_strava_media)
+        print("Fetching Media")
+        access_token = dutil.request_access_token(client_id, client_secret, refresh_token)
+        new_strava_media = dutil.get_activity_media(new_strava_media, access_token)
+
+        print("Saving New Media to DB")
         data_to_insert = new_strava_media.to_dict(orient='records')
         try:
             media_collection.insert_many(data_to_insert)
@@ -160,7 +163,6 @@ with st.expander("Media"):
     else:
         print("No New Media Found")
     
-
 
 # ALL DATA TABLE
 with st.expander("Activities Info"):

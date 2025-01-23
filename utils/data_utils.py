@@ -67,6 +67,36 @@ def get_activity_data(access_token):
     all_activities_df = pd.DataFrame(all_activities_list)
     return all_activities_df
 
+def get_activity_media(new_media_rows, access_token):
+    """
+    Get request for Strava activity media
+
+    Parameters:
+        new_media_rows: DataFrame
+        access_token: string
+
+    Returns:
+        new_media_rows: DF
+    """
+
+    print('\nGetting Activity Media...')
+
+    if(new_media_rows.empty == True):
+        print('\t- No New Media')
+    else: 
+        print('\t- Getting New Media')
+        for index, row in new_media_rows.iterrows(): 
+            id = row['Activity ID']
+            activity_url = "https://www.strava.com/api/v3/activities/" + str(id)
+            header = {'Authorization': 'Bearer ' + access_token}
+            recent_act = requests.get(activity_url, headers=header).json()
+            photos = recent_act['photos']
+            print(photos)
+
+            new_media_rows.loc[index, 'photo'] = str(photos)
+            
+    return new_media_rows
+
 def format_data(df):
     # Change sport type for all commute rides
     df.loc[df['commute'] == True, 'sport_type'] = 'Commute'
@@ -119,58 +149,6 @@ def plot_histogram(df, column_name, bins):
     plt.ylabel("")
     plt.gca().axes.get_yaxis().set_visible(False)
     st.pyplot(plt.gcf()) 
-
-def get_activity_media(data_frame, access_token, filename):
-    """
-    Get request for Strava activity media
-
-    Parameters:
-        data_frame: DataFrame
-        access_token: string
-        filename: string
-
-    Returns:
-        photo_activity_mapping: dict
-    """
-
-    print('\nGetting Activity Media...')
-
-    photo_activity_mapping = {}
-    existing_data = load_data_from_csv(filename)
-
-    new_media_rows = data_frame[ # cross reference all activities with existing data to check for new media
-        (data_frame['id'].isin(existing_data['id']) == False) & 
-        (data_frame['total_photo_count'] > 0) & 
-        (data_frame['type'] != 'VirtualRide') & 
-        (data_frame['type'] != 'VirtualRun')
-    ]        
-    
-    if(new_media_rows.empty == True):
-        print('\t- No New Media')
-    else: 
-        print('\t- Getting New Media')
-        new_media_rows_formatted = pd.DataFrame(columns=['id', 'photo', 'name'])
-        for index, row in new_media_rows.iterrows(): # initiate get request for all activities with new media and add to dictionary 
-            id = row['id']
-            activity_url = "https://www.strava.com/api/v3/activities/" + str(id)
-            header = {'Authorization': 'Bearer ' + access_token}
-            recent_act = requests.get(activity_url, headers=header).json()
-            photo = recent_act['photos']['primary']['urls']['600']
-            name = recent_act['name']
-            print(f'\t\t{name}')
-            photo_activity_mapping[photo] = name
-            new_media_rows_formatted = pd.concat([new_media_rows_formatted, pd.DataFrame({'id': id, 'photo': photo, 'name': name}, index=[0])])
-    
-        updated_data = pd.concat([new_media_rows_formatted, existing_data])
-
-        save_data_to_csv(updated_data, filename) # save new data to csv in order to minimize future get requests
-
-    for index, row in existing_data.iterrows(): # load all saved media into dictionary 
-        photo = row['photo']
-        name = row['name']
-        photo_activity_mapping[photo] = name
-    
-    return photo_activity_mapping   
 
 def init_db_connection(connection_string):
     """
