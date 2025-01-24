@@ -136,7 +136,6 @@ with st.expander("Media"):
 
     media_collection = dutil.get_collection(connection_string, "activity_media")
     media_data = pd.DataFrame(media_collection.find({}))
-    st.write(media_data)
 
     strava_data_media = formatted_data[
         (formatted_data["Photos"] > 0) & \
@@ -145,24 +144,27 @@ with st.expander("Media"):
         (formatted_data["Sport Type"] != "Rowing")
         ]
     strava_data_media = strava_data_media.drop(columns=["Start Date"])
-
     new_strava_media = media_data[~media_data['Activity ID'].isin(strava_data_media['Activity ID'])]
 
     if not new_strava_media.empty:
-        print("Fetching Media")
+        print("New Media Found")
         access_token = dutil.request_access_token(client_id, client_secret, refresh_token)
         new_strava_media = dutil.get_activity_media(new_strava_media, access_token)
-
-        print("Saving New Media to DB")
-        data_to_insert = new_strava_media.to_dict(orient='records')
-        try:
-            media_collection.insert_many(data_to_insert)
-            print("Data successfully inserted into media_collection.")
-        except Exception as e:
-            print(f"An error occurred while inserting data: {e}")
+        dutil.save_media_to_db(new_strava_media, media_collection)
     else:
         print("No New Media Found")
-    
+
+    if sport_type == "All":
+        media_data = media_data
+    else:
+        media_data = media_data[media_data['Sport Type'] == sport_type]
+
+    media_data_list = media_data["Photo URL"].values
+    media_data_list = media_data_list.tolist()
+    if len(media_data_list) == 0:
+        st.write("No Media For This Activity :(")
+    else:
+        st.image(media_data_list, width = 200)
 
 # ALL DATA TABLE
 with st.expander("Activities Info"):

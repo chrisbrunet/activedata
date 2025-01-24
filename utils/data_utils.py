@@ -76,25 +76,22 @@ def get_activity_media(new_media_rows, access_token):
         access_token: string
 
     Returns:
-        new_media_rows: DF
+        new_media_rows: DataFrame
     """
 
-    print('\nGetting Activity Media...')
+    print('\t- Getting New Media')
+    for index, row in new_media_rows.iterrows(): 
+        id = row['Activity ID']
+        activity_url = "https://www.strava.com/api/v3/activities/" + str(id)
+        header = {'Authorization': 'Bearer ' + access_token}
+        recent_act = requests.get(activity_url, headers=header).json()
+        
+        name = recent_act['name']
+        photo = recent_act['photos']['primary']['urls']['600']
+        print(f"\t\t{name} - {photo}")
 
-    if(new_media_rows.empty == True):
-        print('\t- No New Media')
-    else: 
-        print('\t- Getting New Media')
-        for index, row in new_media_rows.iterrows(): 
-            id = row['Activity ID']
-            activity_url = "https://www.strava.com/api/v3/activities/" + str(id)
-            header = {'Authorization': 'Bearer ' + access_token}
-            recent_act = requests.get(activity_url, headers=header).json()
-            photos = recent_act['photos']
-            print(photos)
-
-            new_media_rows.loc[index, 'photo'] = str(photos)
-            
+        new_media_rows.loc[index, 'Photo URL'] = photo
+    print("\t- Finished Getting Media")        
     return new_media_rows
 
 def format_data(df):
@@ -179,3 +176,12 @@ def get_collection(connection_string, collection_name):
     db = client.strava
     collection = db[collection_name]
     return collection
+
+def save_media_to_db(new_strava_media, media_collection):
+    print("Saving New Media to DB")
+    data_to_insert = new_strava_media.to_dict(orient='records')
+    try:
+        media_collection.insert_many(data_to_insert)
+        print("Data successfully inserted into media_collection.")
+    except Exception as e:
+        print(f"An error occurred while inserting data: {e}")
