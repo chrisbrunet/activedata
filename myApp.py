@@ -8,6 +8,8 @@ st.set_page_config(layout="wide")
 
 if 'data' not in st.session_state:
     st.session_state.data = None
+if 'media_data' not in st.session_state:
+    st.session_state.media_data = None
 
 client_id = st.secrets.CLIENT_ID
 client_secret = st.secrets.CLIENT_SECRET
@@ -134,32 +136,33 @@ with st.expander("Map"):
 # MEDIA
 with st.expander("Media"):
 
-    media_collection = dutil.get_collection(connection_string, "activity_media")
-    media_data = pd.DataFrame(media_collection.find({}))
+    if st.session_state.media_data is None:
+        media_collection = dutil.get_collection(connection_string, "activity_media")
+        st.session_state.media_data = pd.DataFrame(media_collection.find({}))
 
-    strava_data_media = formatted_data[
-        (formatted_data["Photos"] > 0) & \
-        (formatted_data["Sport Type"] != "VirtualRide") & \
-        (formatted_data["Sport Type"] != "VirtualRun") & \
-        (formatted_data["Sport Type"] != "Rowing")
-        ]
-    strava_data_media = strava_data_media.drop(columns=["Start Date"])
-    new_strava_media = media_data[~media_data['Activity ID'].isin(strava_data_media['Activity ID'])]
+        strava_data_media = formatted_data[
+            (formatted_data["Photos"] > 0) & \
+            (formatted_data["Sport Type"] != "VirtualRide") & \
+            (formatted_data["Sport Type"] != "VirtualRun") & \
+            (formatted_data["Sport Type"] != "Rowing")
+            ]
+        strava_data_media = strava_data_media.drop(columns=["Start Date"])
+        new_strava_media = st.session_state.media_data[~st.session_state.media_data['Activity ID'].isin(strava_data_media['Activity ID'])]
 
-    if not new_strava_media.empty:
-        print("New Media Found")
-        access_token = dutil.request_access_token(client_id, client_secret, refresh_token)
-        new_strava_media = dutil.get_activity_media(new_strava_media, access_token)
-        dutil.save_media_to_db(new_strava_media, media_collection)
-    else:
-        print("No New Media Found")
+        if not new_strava_media.empty:
+            print("New Media Found")
+            access_token = dutil.request_access_token(client_id, client_secret, refresh_token)
+            new_strava_media = dutil.get_activity_media(new_strava_media, access_token)
+            dutil.save_media_to_db(new_strava_media, media_collection)
+        else:
+            print("No New Media Found")
 
     if sport_type == "All":
-        media_data = media_data
+        filtered_media = st.session_state.media_data
     else:
-        media_data = media_data[media_data['Sport Type'] == sport_type]
+        filtered_media = st.session_state.media_data[st.session_state.media_data['Sport Type'] == sport_type]
 
-    media_data_list = media_data["Photo URL"].values
+    media_data_list = filtered_media["Photo URL"].values
     media_data_list = media_data_list.tolist()
     if len(media_data_list) == 0:
         st.write("No Media For This Activity :(")
