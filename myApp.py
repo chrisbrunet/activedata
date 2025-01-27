@@ -147,13 +147,14 @@ with st.expander("Media"):
             (formatted_data["Sport Type"] != "Rowing")
             ]
         strava_data_media = strava_data_media.drop(columns=["Start Date"])
-        new_strava_media = st.session_state.media_data[~st.session_state.media_data['Activity ID'].isin(strava_data_media['Activity ID'])]
+        new_strava_media = strava_data_media[~strava_data_media['Activity ID'].isin(st.session_state.media_data['Activity ID'])]
 
         if not new_strava_media.empty:
             print("New Media Found")
             access_token = dutil.request_access_token(client_id, client_secret, refresh_token)
             new_strava_media = dutil.get_activity_media(new_strava_media, access_token)
             dutil.save_media_to_db(new_strava_media, media_collection)
+            st.session_state.media_data = pd.DataFrame(media_collection.find({}))
         else:
             print("No New Media Found")
 
