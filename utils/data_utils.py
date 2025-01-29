@@ -53,6 +53,8 @@ def get_activity_data(access_token):
     header = {'Authorization': 'Bearer ' + access_token}
     request_page_num = 1
     all_activities_list = []
+
+    status_placeholder = st.empty()
     
     while True: # since max 200 activities can be accessed per request, while loop runs until all activities are loaded
         param = {'per_page': 200, 'page': request_page_num}
@@ -60,9 +62,11 @@ def get_activity_data(access_token):
         if len(get_activities) == 0: # exit condition
             break
         all_activities_list.extend(get_activities)
+        status_placeholder.write(f'\t- Activities: {len(all_activities_list) - len(get_activities)} to {len(all_activities_list)}')
         print(f'\t- Activities: {len(all_activities_list) - len(get_activities)} to {len(all_activities_list)}')
         request_page_num += 1
     
+    status_placeholder.empty() 
     print("\nFinished Getting Data")
     all_activities_df = pd.DataFrame(all_activities_list)
     return all_activities_df
