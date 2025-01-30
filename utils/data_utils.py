@@ -7,7 +7,6 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 from utils.data_mappings import column_rename_map
 
-@st.cache_resource
 def request_access_token(client_id, client_secret, refresh_token):
     """
     Post request to refresh and get new API access token
@@ -34,7 +33,7 @@ def request_access_token(client_id, client_secret, refresh_token):
     print(f"\nAccess Token = {access_token}")
     return access_token
 
-@st.cache_resource(ttl=600, show_spinner=False)
+# @st.cache_resource(ttl=600, show_spinner=False)
 def get_activity_data(access_token):
     """
     Get request for Strava user activity data 
@@ -46,7 +45,6 @@ def get_activity_data(access_token):
     
     Returns:
         all_activities_df: DataFrame
-        all_activities_list: list
     """
     print("\nGetting Activity Data...")
     activities_url = "https://www.strava.com/api/v3/athlete/activities"
@@ -61,9 +59,13 @@ def get_activity_data(access_token):
         get_activities = requests.get(activities_url, headers=header,params=param).json()
         if len(get_activities) == 0: # exit condition
             break
+        elif len(get_activities) == 2:
+            st.write("Something went wrong!")
+            st.write(get_activities)
+            break
         all_activities_list.extend(get_activities)
-        status_placeholder.write(f'\t- Activities: {len(all_activities_list) - len(get_activities)} to {len(all_activities_list)}')
-        print(f'\t- Activities: {len(all_activities_list) - len(get_activities)} to {len(all_activities_list)}')
+        status_placeholder.write(f'\tActivities: {len(all_activities_list) - len(get_activities) + 1} to {len(all_activities_list)}')
+        print(f'\t- Activities: {len(all_activities_list) - len(get_activities) + 1} to {len(all_activities_list)}')
         request_page_num += 1
     
     status_placeholder.empty() 
