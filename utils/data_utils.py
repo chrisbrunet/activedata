@@ -7,6 +7,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 from utils.data_mappings import column_rename_map
 
+@st.cache_data(ttl=600, show_spinner=False)
 def request_access_token(client_id, client_secret, refresh_token):
     """
     Post request to refresh and get new API access token
@@ -33,7 +34,7 @@ def request_access_token(client_id, client_secret, refresh_token):
     print(f"\nAccess Token = {access_token}")
     return access_token
 
-# @st.cache_resource(ttl=600, show_spinner=False)
+@st.cache_data(ttl=600, show_spinner=False)
 def get_activity_data(access_token):
     """
     Get request for Strava user activity data 
@@ -61,7 +62,7 @@ def get_activity_data(access_token):
             break
         elif len(get_activities) == 2:
             st.write("Something went wrong!")
-            st.write(get_activities)
+            st.write(get_activities["message"])
             break
         all_activities_list.extend(get_activities)
         status_placeholder.write(f'\tActivities: {len(all_activities_list) - len(get_activities) + 1} to {len(all_activities_list)}')
