@@ -56,29 +56,29 @@ if not st.session_state.data.empty:
             total_activities = filtered_df["Name"].count()
             total_time = filtered_df["Moving Time (s)"].sum()
 
-            st.metric("Total Activities", total_activities)
-            st.metric("Total Time (hrs)", round(total_time/60/60, 1))
+            st.metric("Total Activities", f"{total_activities:,}")
+            st.metric("Total Time (hrs)", f"{round(total_time/60/60, 1):,}")
 
         with col2:
             total_dist = filtered_df["Distance (km)"].sum()
             avg_dist = filtered_df["Distance (km)"].mean()
 
-            st.metric("Total Distance (km)", round(total_dist, 2))
-            st.metric("Average Distance", round(avg_dist, 2))
+            st.metric("Total Distance (km)", f"{round(total_dist, 1):,}")
+            st.metric("Average Distance (km)", f"{round(avg_dist, 1):,}")
 
         with col3:
             total_elevation = filtered_df["Elevation Gain (m)"].sum()
             avg_elevation = filtered_df["Elevation Gain (m)"].mean()
 
-            st.metric("Total Elevation (m)", round(total_elevation, 2))
-            st.metric("Average Elevation (m)", round(avg_elevation, 2))
+            st.metric("Total Elevation (m)", f"{round(total_elevation, 1):,}")
+            st.metric("Average Elevation (m)", f"{round(avg_elevation, 1):,}")
 
         with col4:
             max_speed = filtered_df["Max Speed (km/h)"].max()
             avg_speed = filtered_df["Average Speed (km/h)"].mean()
 
-            st.metric("Max Speed (km/h)", round(max_speed, 2))
-            st.metric("Average Speed (km/h)", round(avg_speed))
+            st.metric("Max Speed (km/h)", f"{round(max_speed, 1):,}")
+            st.metric("Average Speed (km/h)", f"{round(avg_speed, 1):,}")
 
     # GRAPHS
     with st.expander("Graphs"):
@@ -111,7 +111,7 @@ if not st.session_state.data.empty:
                 data=polylines,
                 get_source_position="start",
                 get_target_position="end",
-                get_width=5, 
+                get_width=1, 
                 get_color=[255, 0, 0], 
                 highlight_color=[255, 255, 0],
                 picking_radius=10,
@@ -128,7 +128,7 @@ if not st.session_state.data.empty:
                     latitude=location["latitude"], longitude=location["longitude"], controller=True, zoom=9,
                 )
 
-            chart = pdk.Deck(layers=line_layer, initial_view_state=view_state)
+            chart = pdk.Deck(layers=line_layer, initial_view_state=view_state, map_style="light")
 
             event = st.pydeck_chart(chart)
         else:
@@ -173,6 +173,9 @@ if not st.session_state.data.empty:
 
     # ALL DATA TABLE
     with st.expander("Activities Info"):
-        st.write(filtered_df)
+        display_data = filtered_df
+        columns_to_drop = ['Activity ID', 'Map', 'Photos']
+        display_data = display_data.drop(columns=columns_to_drop)
+        st.write(display_data)
 
 

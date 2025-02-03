@@ -8,7 +8,7 @@ import seaborn as sns
 import datetime
 from utils.data_mappings import column_rename_map
 
-# @st.cache_data(ttl=600, show_spinner=False)
+@st.cache_data(ttl=600, show_spinner=False)
 def request_access_token(client_id, client_secret, refresh_token):
     """
     Post request to refresh and get new API access token
@@ -35,7 +35,7 @@ def request_access_token(client_id, client_secret, refresh_token):
     print(f"\nAccess Token = {access_token}")
     return access_token
 
-# @st.cache_data(ttl=600, show_spinner=False)
+@st.cache_data(ttl=600, show_spinner=False)
 def get_activity_data(access_token):
     """
     Get request for Strava user activity data 
