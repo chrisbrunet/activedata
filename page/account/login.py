@@ -14,12 +14,9 @@ auth_url = auth.get_authorization_url(app_url, client_id)
 
 st.header("Welcome to the Strava Data Analyzer!")
 
-st.write("This web app can connect to your Strava account and display all of you activity data.")
+st.write("This web app can connect to your Strava account and display all of you activity data. To use this app, please authorize Strava access by clicking the button below:")
 
-st.write("To use this app, please authorize Strava access by clicking the button below:")
-
-st.write(auth_url)
-st.link_button("Login with Strava", auth_url)
+st.link_button("Login with Strava 🏃", auth_url)
 
 try:
     st.session_state.refresh_token = st.query_params.code
