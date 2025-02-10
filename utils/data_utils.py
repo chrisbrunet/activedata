@@ -9,33 +9,6 @@ import datetime
 from utils.data_mappings import column_rename_map
 
 @st.cache_data(ttl=600, show_spinner=False)
-def request_access_token(client_id, client_secret, refresh_token):
-    """
-    Post request to refresh and get new API access token
-
-    Parameters:
-        client_id: string
-        client_secret: string
-        refresh_token: string
-    
-    Returns:
-        access_token: string
-    """
-    auth_url = "https://www.strava.com/oauth/token"
-    payload = {
-        'client_id': client_id,
-        'client_secret': client_secret,
-        'refresh_token': refresh_token,
-        'grant_type': 'refresh_token',
-        'f': 'json'
-    }
-    print("\nRequesting Access Token...")
-    res = requests.post(auth_url, data=payload, verify=False)
-    access_token = res.json()['access_token']
-    print(f"\nAccess Token = {access_token}")
-    return access_token
-
-@st.cache_data(ttl=600, show_spinner=False)
 def get_activity_data(access_token):
     """
     Get request for Strava user activity data 
