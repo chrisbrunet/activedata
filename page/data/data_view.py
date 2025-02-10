@@ -20,6 +20,9 @@ def logout():
 
 # st.write(st.session_state.access_token)
 
+athlete_id = st.session_state.access_token['athlete']['id']
+athlete_link = f'https://www.strava.com/athletes/{athlete_id}'
+
 if st.session_state.data is None:
     with st.spinner("Getting Data..."):
         # access_token = dutil.request_access_token(client_id, client_secret, refresh_token)
@@ -32,13 +35,24 @@ if not st.session_state.data.empty:
 
     # PROFILE & FILTERS SIDEBAR
     with st.sidebar:
+
+        col11, col12 = st.columns(2)
         firstname = st.session_state.access_token['athlete']['firstname']
         lastname = st.session_state.access_token['athlete']['lastname']
         profile_photo = st.session_state.access_token['athlete']['profile']
 
-        st.header(f"{firstname} {lastname}")
-        st.image(profile_photo)
+        with col11:
+            st.header(f"{firstname} {lastname}")
+            st.image(profile_photo)
+            link = f"""
+                <a href="{athlete_link}" style="color: #FC4C02; font-weight: bold; text-decoration: underline;">
+                    View on Strava
+                </a>
+            """
+            st.markdown(link, unsafe_allow_html=True)
+
         st.divider()
+    
 
         sport_types = formatted_data['Sport Type'].unique().tolist()
         sport_types.insert(0, "All")
@@ -65,9 +79,6 @@ if not st.session_state.data.empty:
 
         with col4:
             st.image("assets/api_logo_pwrdBy_strava_stack_light.png", use_container_width="always")
-
-
-
 
     # TOTALS CONTAINER
     with st.container(border=True):
