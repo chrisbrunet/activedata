@@ -18,8 +18,8 @@ st.write("This web app can connect to your Strava account and display all of you
 
 st.write("To use this app, please authorize Strava access by clicking the button below:")
 
-link = f"""<a href="{auth_url}" onclick="window.location.href='{auth_url}'; return false;" class="button">👤 Login and Authenticate</a>"""
-st.markdown(link, unsafe_allow_html=True)
+st.write(auth_url)
+st.link_button("Login with Strava", auth_url)
 
 try:
     st.session_state.refresh_token = st.query_params.code
