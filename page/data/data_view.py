@@ -18,7 +18,6 @@ def logout():
     st.session_state.refresh_token = None
     st.session_state.access_token = None
 
-st.header("Strava Data Analyzer")
 # st.write(st.session_state.access_token)
 
 if st.session_state.data is None:
@@ -31,8 +30,16 @@ if not st.session_state.data.empty:
     # st.write(st.session_state.data)
     formatted_data = dutil.format_data(st.session_state.data)
 
-    # FILTERS SIDEBAR
+    # PROFILE & FILTERS SIDEBAR
     with st.sidebar:
+        firstname = st.session_state.access_token['athlete']['firstname']
+        lastname = st.session_state.access_token['athlete']['lastname']
+        profile_photo = st.session_state.access_token['athlete']['profile']
+
+        st.header(f"{firstname} {lastname}")
+        st.image(profile_photo)
+        st.divider()
+
         sport_types = formatted_data['Sport Type'].unique().tolist()
         sport_types.insert(0, "All")
         sport_type = st.selectbox("Sport Type", sport_types)
@@ -141,7 +148,7 @@ if not st.session_state.data.empty:
             st.write("No Map Data For This Activity :(")  
 
     # ALL DATA TABLE
-    with st.expander("Activities Info"):
+    with st.expander("Activities Info Table"):
         display_data = filtered_df
         columns_to_drop = ['Activity ID', 'Map', 'Photos']
         display_data = display_data.drop(columns=columns_to_drop)

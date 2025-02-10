@@ -29,12 +29,4 @@ if st.session_state.refresh_token is not None:
 
     if st.session_state.access_token is not None:
         st.session_state.logged_in = True
-
-        firstname = st.session_state.access_token['athlete']['firstname']
-        lastname = st.session_state.access_token['athlete']['lastname']
-        profile_photo = st.session_state.access_token['athlete']['profile']
-
-        st.write(f"Welcome: {firstname} {lastname}!")
-        st.image(profile_photo)
-
-        st.button("Proceed to Site?")
+        st.rerun()
