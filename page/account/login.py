@@ -11,7 +11,7 @@ def get_base64_image(image_path):
     with open(image_path, "rb") as img_file:
         return base64.b64encode(img_file.read()).decode()
 
-image_base64 = get_base64_image("assets/strava_icon.png")
+image_base64 = get_base64_image("assets/btn_strava_connectwith_orange@2x.png")
 
 client_id = st.secrets.CLIENT_ID
 client_secret = st.secrets.CLIENT_SECRET

@@ -58,7 +58,16 @@ if not st.session_state.data.empty:
             
         filtered_df = filtered_df[(filtered_df['Start Date'] >= start_date) & (filtered_df['Start Date'] <= end_date)]
 
-        logout_button = st.button("Log Out", on_click=logout)
+        st.divider()
+        col3, col4 = st.columns(2)
+        with col3:
+            logout_button = st.button("Log Out", on_click=logout)
+
+        with col4:
+            st.image("assets/api_logo_pwrdBy_strava_stack_light.png", use_container_width="always")
+
+
+
 
     # TOTALS CONTAINER
     with st.container(border=True):
@@ -190,3 +199,4 @@ if not st.session_state.data.empty:
     #         st.write("No Media For This Activity :(")
     #     else:
     #         st.image(media_data_list, width = 200)
+
