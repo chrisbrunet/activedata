@@ -39,5 +39,4 @@ def request_access_token(client_id, client_secret, refresh_token):
     print("\nRequesting Access Token...")
     res = requests.post(auth_url, data=payload, verify=False)
     access_token = res.json()
-    # print(f"\nAccess Token = {access_token}")
     return access_token

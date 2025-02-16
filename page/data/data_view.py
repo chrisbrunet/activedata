@@ -19,13 +19,13 @@ def logout():
     st.session_state.access_token = None
 
 # st.write(st.session_state.access_token)
+print(st.session_state.access_token)
 
 athlete_id = st.session_state.access_token['athlete']['id']
 athlete_link = f'https://www.strava.com/athletes/{athlete_id}'
 
 if st.session_state.data is None:
     with st.spinner("Getting Data..."):
-        # access_token = dutil.request_access_token(client_id, client_secret, refresh_token)
         access_code = st.session_state.access_token['access_token']
         st.session_state.data = dutil.get_activity_data(access_code)
 
