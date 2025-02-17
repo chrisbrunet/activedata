@@ -16,14 +16,14 @@ def get_authorization_url(app_url, client_id):
     return rv
 
 # @st.cache_data(ttl=600, show_spinner=False)
-def request_access_token(client_id, client_secret, refresh_token):
+def request_access_token(client_id, client_secret, auth_code):
     """
     Post request to refresh and get new API access token
 
     Parameters:
         client_id: string
         client_secret: string
-        refresh_token: string
+        auth_code: string
     
     Returns:
         access_token: string
@@ -32,7 +32,7 @@ def request_access_token(client_id, client_secret, refresh_token):
     payload = {
         'client_id': client_id,
         'client_secret': client_secret,
-        'code': refresh_token,
+        'code': auth_code,
         'grant_type': 'authorization_code',
         'f': 'json'
     }

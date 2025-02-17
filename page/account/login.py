@@ -3,7 +3,7 @@ import utils.auth as auth
 import base64
 
 if "refresh_token" not in st.session_state:
-    st.session_state.refresh_token = None
+    st.session_state.auth_code = None
 if "access_token" not in st.session_state:
     st.session_state.access_token = None
 
@@ -31,13 +31,13 @@ html = f"""
 st.markdown(html, unsafe_allow_html=True)
 
 try:
-    st.session_state.refresh_token = st.query_params.code
+    st.session_state.auth_code = st.query_params.code
     st.query_params.clear()
 except:
-    st.session_state.refresh_token = None
+    st.session_state.auth_code = None
 
-if st.session_state.refresh_token is not None:
-    st.session_state.access_token = auth.request_access_token(client_id, client_secret, st.session_state.refresh_token)
+if st.session_state.auth_code is not None:
+    st.session_state.access_token = auth.request_access_token(client_id, client_secret, st.session_state.auth_code)
 
     if st.session_state.access_token is not None:
         st.session_state.logged_in = True

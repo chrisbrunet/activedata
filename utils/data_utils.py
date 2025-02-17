@@ -80,14 +80,20 @@ def get_activity_media(new_media_rows, access_token):
 def format_data(df):
     # Change sport type for all commute rides
     df.loc[df['commute'] == True, 'sport_type'] = 'Commute'
-
+    
+    # Ensure all required columns exist
+    for col in column_rename_map.keys():
+        if col not in df.columns:
+            df[col] = None
+    
     columns_to_keep = column_rename_map.keys()
-    df = df[columns_to_keep]
+    df = df[list(columns_to_keep)]
     df = df.rename(columns=column_rename_map)
 
-    df['Distance (km)'] = df['Distance (km)']/1000
-    df['Average Speed (km/h)'] = df['Average Speed (km/h)']*3.6
-    df['Max Speed (km/h)'] = df['Max Speed (km/h)']*3.
+    # Convert units
+    df['Distance (km)'] = df['Distance (km)'] / 1000
+    df['Average Speed (km/h)'] = df['Average Speed (km/h)'] * 3.6
+    df['Max Speed (km/h)'] = df['Max Speed (km/h)'] * 3.6
     df['Start Date'] = pd.to_datetime(df['Start Date']).dt.date
 
     return df
