@@ -36,10 +36,6 @@ def get_activity_data(access_token):
         get_activities = requests.get(activities_url, headers=header,params=param).json()
         if len(get_activities) == 0: # exit condition
             break
-        elif len(get_activities) == 2:
-            st.write("Something went wrong!")
-            st.write(get_activities["message"])
-            break
         all_activities_list.extend(get_activities)
         status_placeholder.write(f'\tActivities: {len(all_activities_list) - len(get_activities) + 1} to {len(all_activities_list)}')
         print(f'\t- Activities: {len(all_activities_list) - len(get_activities) + 1} to {len(all_activities_list)}')
