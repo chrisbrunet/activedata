@@ -5,7 +5,6 @@ import polyline
 import pymongo
 import matplotlib.pyplot as plt
 import seaborn as sns
-import datetime
 from utils.data_mappings import column_rename_map
 
 @st.cache_data(ttl=600, show_spinner=False)
@@ -21,8 +20,7 @@ def get_activity_data(access_token):
     Returns:
         all_activities_df: DataFrame
     """
-    now = datetime.datetime.now()
-    print(f"\nCurrent time: {now}")
+
     print("Getting Activity Data...")
     activities_url = "https://www.strava.com/api/v3/athlete/activities"
     header = {'Authorization': 'Bearer ' + access_token}

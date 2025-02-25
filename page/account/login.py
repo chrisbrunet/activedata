@@ -1,6 +1,7 @@
 import streamlit as st
 import utils.auth as auth
 import base64
+import datetime
 
 if "refresh_token" not in st.session_state:
     st.session_state.auth_code = None
@@ -37,15 +38,21 @@ except:
     st.session_state.auth_code = None
 
 if st.session_state.auth_code is not None:
+    print("\n***** NEW LOGIN *****")
+    now = datetime.datetime.now()
+    print(f"Current time: {now}")
+    print(f"auth_code: {st.session_state.auth_code}")
     st.session_state.access_token = auth.request_access_token(client_id, client_secret, st.session_state.auth_code)
+    print(f"\naccess_token: {st.session_state.access_token}")
 
     if st.session_state.access_token is not None:
-        try: 
-            athlete_id = st.session_state.access_token['athlete']['id']
-            st.session_state.logged_in = True
-            st.rerun()
-        except:
-            st.warning("Something went wrong! This happens from time to time. Try refreshing the page and logging in again.")
+            try: 
+                athlete_id = st.session_state.access_token['athlete']['id']
+            except:
+                st.warning("Something went wrong! This happens from time to time. Try refreshing the page and logging in again.")
+            else:
+                st.session_state.logged_in = True
+                st.rerun()
 
 st.container(height=200, border=False)
 st.image("assets/api_logo_pwrdBy_strava_stack_light.png", width=130)

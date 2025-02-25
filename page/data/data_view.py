@@ -4,8 +4,6 @@ import pandas as pd
 from utils import data_utils as dutil
 from streamlit_geolocation import streamlit_geolocation
 
-st.set_page_config(layout="wide")
-
 if 'data' not in st.session_state:
     st.session_state.data = None
 if 'media_data' not in st.session_state:
@@ -17,9 +15,6 @@ def logout():
     st.session_state.logged_in = False
     st.session_state.refresh_token = None
     st.session_state.access_token = None
-
-# st.write(st.session_state.access_token)
-print(st.session_state.access_token)
 
 athlete_id = st.session_state.access_token['athlete']['id']
 athlete_link = f'https://www.strava.com/athletes/{athlete_id}'

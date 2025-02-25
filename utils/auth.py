@@ -1,5 +1,8 @@
 import urllib
+import urllib3
 import requests
+
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 def get_authorization_url(app_url, client_id):
     """Generate authorization uri"""
@@ -15,7 +18,6 @@ def get_authorization_url(app_url, client_id):
     rv = base_url + '?' + values_url
     return rv
 
-# @st.cache_data(ttl=600, show_spinner=False)
 def request_access_token(client_id, client_secret, auth_code):
     """
     Post request to refresh and get new API access token
