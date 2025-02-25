@@ -40,8 +40,12 @@ if st.session_state.auth_code is not None:
     st.session_state.access_token = auth.request_access_token(client_id, client_secret, st.session_state.auth_code)
 
     if st.session_state.access_token is not None:
-        st.session_state.logged_in = True
-        st.rerun()
+        try: 
+            athlete_id = st.session_state.access_token['athlete']['id']
+            st.session_state.logged_in = True
+            st.rerun()
+        except:
+            st.warning("Something went wrong! This happens from time to time. Try refreshing the page and logging in again.")
 
 st.container(height=200, border=False)
 st.image("assets/api_logo_pwrdBy_strava_stack_light.png", width=130)
