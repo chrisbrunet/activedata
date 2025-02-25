@@ -100,8 +100,17 @@ def get_polylines(df):
         map_data = pd.DataFrame([row['Map']])
         polylines = map_data["summary_polyline"].values
         coordinates = polyline.decode(polylines[0])
+        activity_name = row["Name"]
+        distance = round(row["Distance (km)"])
+        elevation = round(row["Elevation Gain (m)"])
+        description = f"{activity_name}\n{distance} km\n{elevation} m"
         for coord in coordinates:
-            rows.append({"name": map_data["id"].values, "latitude": coord[0], "longitude": coord[1]})
+            rows.append({
+                "description": description,
+                "name": map_data["id"].values, 
+                "latitude": coord[0], 
+                "longitude": coord[1]
+                })
 
     polylines_df = pd.DataFrame(rows)
 
@@ -115,6 +124,7 @@ def get_polylines(df):
             polylines_df.groupby("name")
             .apply(
                 lambda group: pd.DataFrame({
+                    "description": group["description"].iloc[:-1],
                     "name": group["name"].iloc[:-1], 
                     "start": group[["longitude", "latitude"]].values[:-1].tolist(),
                     "end": group[["longitude", "latitude"]].values[1:].tolist(), 

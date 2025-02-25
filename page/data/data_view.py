@@ -161,7 +161,7 @@ if not st.session_state.data.empty:
                     latitude=location["latitude"], longitude=location["longitude"], controller=True, zoom=9,
                 )
 
-            chart = pdk.Deck(layers=line_layer, initial_view_state=view_state, map_style="light")
+            chart = pdk.Deck(layers=line_layer, initial_view_state=view_state, map_style="light", tooltip={'text': '{description}'})
 
             event = st.pydeck_chart(chart)
         else:
