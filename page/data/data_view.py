@@ -9,8 +9,6 @@ if 'data' not in st.session_state:
 if 'media_data' not in st.session_state:
     st.session_state.media_data = None
 
-connection_string = st.secrets.CONNECTION_STRING
-
 def logout():
     st.session_state.logged_in = False
     st.session_state.refresh_token = None
@@ -168,41 +166,3 @@ if not st.session_state.data.empty:
         columns_to_drop = ['Activity ID', 'Map', 'Photos']
         display_data = display_data.drop(columns=columns_to_drop)
         st.write(display_data)
-
-    # MEDIA
-    # with st.expander("Media"):
-
-    #     if st.session_state.media_data is None:
-    #         media_collection = dutil.get_collection(connection_string, "activity_media")
-    #         st.session_state.media_data = pd.DataFrame(media_collection.find({}))
-
-    #         strava_data_media = formatted_data[
-    #             (formatted_data["Photos"] > 0) & \
-    #             (formatted_data["Sport Type"] != "VirtualRide") & \
-    #             (formatted_data["Sport Type"] != "VirtualRun") & \
-    #             (formatted_data["Sport Type"] != "Rowing")
-    #             ]
-    #         strava_data_media = strava_data_media.drop(columns=["Start Date"])
-    #         new_strava_media = strava_data_media[~strava_data_media['Activity ID'].isin(st.session_state.media_data['Activity ID'])]
-
-    #         if not new_strava_media.empty:
-    #             print("New Media Found")
-    #             access_token = dutil.request_access_token(client_id, client_secret, refresh_token)
-    #             new_strava_media = dutil.get_activity_media(new_strava_media, access_token)
-    #             dutil.save_media_to_db(new_strava_media, media_collection)
-    #             st.session_state.media_data = pd.DataFrame(media_collection.find({}))
-    #         else:
-    #             print("No New Media Found")
-
-    #     if sport_type == "All":
-    #         filtered_media = st.session_state.media_data
-    #     else:
-    #         filtered_media = st.session_state.media_data[st.session_state.media_data['Sport Type'] == sport_type]
-
-    #     media_data_list = filtered_media["Photo URL"].values
-    #     media_data_list = media_data_list.tolist()
-    #     if len(media_data_list) == 0:
-    #         st.write("No Media For This Activity :(")
-    #     else:
-    #         st.image(media_data_list, width = 200)
-

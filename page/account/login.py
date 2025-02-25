@@ -43,7 +43,7 @@ if st.session_state.auth_code is not None:
     print(f"Current time: {now}")
     print(f"auth_code: {st.session_state.auth_code}")
     st.session_state.access_token = auth.request_access_token(client_id, client_secret, st.session_state.auth_code)
-    print(f"\naccess_token: {st.session_state.access_token}")
+    print(f"access_token: {st.session_state.access_token}")
 
     if st.session_state.access_token is not None:
             try: 

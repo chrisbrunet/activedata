@@ -7,21 +7,19 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 from utils.data_mappings import column_rename_map
 
-@st.cache_data(ttl=600, show_spinner=False)
+@st.cache_data(show_spinner=False)
 def get_activity_data(access_token):
     """
     Get request for Strava user activity data 
 
     Parameters:
-        client_id: string
-        client_secret: string
-        refresh_token: string
+        access_token: String
     
     Returns:
         all_activities_df: DataFrame
     """
 
-    print("Getting Activity Data...")
+    print("\nGetting Activity Data...")
     activities_url = "https://www.strava.com/api/v3/athlete/activities"
     header = {'Authorization': 'Bearer ' + access_token}
     request_page_num = 1
@@ -40,38 +38,20 @@ def get_activity_data(access_token):
         request_page_num += 1
     
     status_placeholder.empty() 
-    print("\nFinished Getting Data")
+    print("Finished Getting Data")
     all_activities_df = pd.DataFrame(all_activities_list)
     return all_activities_df
 
-def get_activity_media(new_media_rows, access_token):
+def format_data(df):
     """
-    Get request for Strava activity media
+    Formats activity data into clean standardized form 
 
     Parameters:
-        new_media_rows: DataFrame
-        access_token: string
-
+        df: DataFrame
+    
     Returns:
-        new_media_rows: DataFrame
+        df: DataFrame
     """
-
-    print('\t- Getting New Media')
-    for index, row in new_media_rows.iterrows(): 
-        id = row['Activity ID']
-        activity_url = "https://www.strava.com/api/v3/activities/" + str(id)
-        header = {'Authorization': 'Bearer ' + access_token}
-        recent_act = requests.get(activity_url, headers=header).json()
-        
-        name = recent_act['name']
-        photo = recent_act['photos']['primary']['urls']['600']
-        print(f"\t\t{name} - {photo}")
-
-        new_media_rows.loc[index, 'Photo URL'] = photo
-    print("\t- Finished Getting Media")        
-    return new_media_rows
-
-def format_data(df):
     # Change sport type for all commute rides
     df.loc[df['commute'] == True, 'sport_type'] = 'Commute'
     
@@ -93,6 +73,15 @@ def format_data(df):
     return df
 
 def get_polylines(df):
+    """
+    Decodes polylines and formats into DataFrame usable with PyDeck
+
+    Parameters:
+        df: DataFrame
+    
+    Returns:
+        polylines_transformed: DataFrame
+    """
     rows = []
     for index, row in df.iterrows():
         map_data = pd.DataFrame([row['Map']])
@@ -133,48 +122,20 @@ def get_polylines(df):
         return polylines_transformed
 
 def plot_histogram(df, column_name, bins):
+    """
+    Plots user activity stats in a histogram 
+
+    Parameters:
+        df: DataFrame
+        column_name: String
+        bins: int
+    
+    Returns:
+        none
+    """
     plt.figure(figsize=(5, 3))
     sns.histplot(df[column_name], bins=bins, kde=True, color="blue")
     plt.xlabel(column_name)
     plt.ylabel("")
     plt.gca().axes.get_yaxis().set_visible(False)
     st.pyplot(plt.gcf()) 
-
-def init_db_connection(connection_string):
-    """
-    Initializes connection to MongoDB cluster
-
-    Parameters:
-    None
-
-    Returns:
-    client (MongoClient): Client for a MongoDB instance
-
-    """
-    client = pymongo.MongoClient(connection_string, tls=True)
-    return client
-
-def get_collection(connection_string, collection_name):
-    """
-    Retrieves a collection from the spectra database
-
-    Parameters:
-    collection_name (str): name of collection 
-
-    Returns:
-    collection: (Collection): specified collection
-
-    """
-    client = init_db_connection(connection_string)
-    db = client.strava
-    collection = db[collection_name]
-    return collection
-
-def save_media_to_db(new_strava_media, media_collection):
-    print("Saving New Media to DB")
-    data_to_insert = new_strava_media.to_dict(orient='records')
-    try:
-        media_collection.insert_many(data_to_insert)
-        print("Data successfully inserted into media_collection.")
-    except Exception as e:
-        print(f"An error occurred while inserting data: {e}")
