@@ -19,7 +19,7 @@ app_url = st.secrets.APP_URL
 
 auth_url = auth.get_authorization_url(app_url, client_id)
 
-st.header("Welcome to the ActiveData!")
+st.header("Welcome to ActiveData!")
 
 st.write("This web app can connect to your Strava account and display your activity data through various visualizations. To use this app, please authorize Strava access by clicking the button below:")
 
