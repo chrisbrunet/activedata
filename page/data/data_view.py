@@ -23,7 +23,6 @@ if st.session_state.data is None:
         st.session_state.data = dutil.get_activity_data(access_code)
 
 if not st.session_state.data.empty:
-    # st.write(st.session_state.data)
     formatted_data = dutil.format_data(st.session_state.data)
 
     # PROFILE & FILTERS SIDEBAR
@@ -45,16 +44,14 @@ if not st.session_state.data.empty:
             st.markdown(link, unsafe_allow_html=True)
 
         st.divider()
-    
 
         sport_types = formatted_data['Sport Type'].unique().tolist()
-        sport_types.insert(0, "All")
-        sport_type = st.selectbox("Sport Type", sport_types)
+        sport_type = st.multiselect("Sport Type", sport_types)
 
-        if sport_type == "All":
+        if not sport_type:
             filtered_df = formatted_data
         else:
-            filtered_df = formatted_data[formatted_data['Sport Type'] == sport_type]
+            filtered_df = formatted_data[formatted_data['Sport Type'].isin(sport_type)]
 
         start_date_default = filtered_df['Start Date'].min()
         col1, col2 = st.columns(2)
@@ -62,8 +59,11 @@ if not st.session_state.data.empty:
             start_date = st.date_input("Start Date", start_date_default)
         with col2:
             end_date = st.date_input("End Date")
-            
+        
         filtered_df = filtered_df[(filtered_df['Start Date'] >= start_date) & (filtered_df['Start Date'] <= end_date)]
+
+        if "AlpineSki" in sport_types:
+            include_apline_skis = st.checkbox("Include Alpine Skis in Elevation")
 
         st.divider()
         col3, col4 = st.columns(2)
@@ -93,8 +93,12 @@ if not st.session_state.data.empty:
             st.metric("Average Distance (km)", f"{round(avg_dist, 1):,}")
 
         with col3:
-            total_elevation = filtered_df["Elevation Gain (m)"].sum()
-            avg_elevation = filtered_df["Elevation Gain (m)"].mean()
+            if include_apline_skis:
+                total_elevation = filtered_df["Elevation Gain (m)"].sum()
+                avg_elevation = filtered_df["Elevation Gain (m)"].mean()
+            else:
+                total_elevation = filtered_df[filtered_df["Sport Type"] != "AlpineSki"]["Elevation Gain (m)"].sum()
+                avg_elevation = filtered_df[filtered_df["Sport Type"] != "AlpineSki"]["Elevation Gain (m)"].mean()
 
             st.metric("Total Elevation (m)", f"{round(total_elevation, 1):,}")
             st.metric("Average Elevation (m)", f"{round(avg_elevation, 1):,}")
