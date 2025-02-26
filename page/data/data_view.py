@@ -35,7 +35,10 @@ if not st.session_state.data.empty:
 
         with col11:
             st.header(f"{firstname} {lastname}")
-            st.image(profile_photo)
+
+            if not profile_photo == "avatar/athlete/large.png":
+                st.image(profile_photo)
+
             link = f"""
                 <a href="{athlete_link}" style="color: #FC4C02; font-weight: bold; text-decoration: underline;">
                     View on Strava
@@ -159,7 +162,6 @@ if not st.session_state.data.empty:
                 )
 
             chart = pdk.Deck(layers=line_layer, initial_view_state=view_state, map_style="light", tooltip={'text': '{description}'})
-
             event = st.pydeck_chart(chart)
         else:
             st.write("No Map Data For This Activity :(")  
