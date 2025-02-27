@@ -96,12 +96,16 @@ if not st.session_state.data.empty:
             st.metric("Average Distance (km)", f"{round(avg_dist, 1):,}")
 
         with col3:
-            if include_apline_skis:
+            try:
+                if include_apline_skis:
+                    total_elevation = filtered_df["Elevation Gain (m)"].sum()
+                    avg_elevation = filtered_df["Elevation Gain (m)"].mean()
+                else:
+                    total_elevation = filtered_df[filtered_df["Sport Type"] != "AlpineSki"]["Elevation Gain (m)"].sum()
+                    avg_elevation = filtered_df[filtered_df["Sport Type"] != "AlpineSki"]["Elevation Gain (m)"].mean()
+            except: 
                 total_elevation = filtered_df["Elevation Gain (m)"].sum()
                 avg_elevation = filtered_df["Elevation Gain (m)"].mean()
-            else:
-                total_elevation = filtered_df[filtered_df["Sport Type"] != "AlpineSki"]["Elevation Gain (m)"].sum()
-                avg_elevation = filtered_df[filtered_df["Sport Type"] != "AlpineSki"]["Elevation Gain (m)"].mean()
 
             st.metric("Total Elevation (m)", f"{round(total_elevation, 1):,}")
             st.metric("Average Elevation (m)", f"{round(avg_elevation, 1):,}")
