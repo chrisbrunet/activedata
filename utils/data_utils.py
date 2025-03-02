@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 from utils.data_mappings import column_rename_map
 
-@st.cache_data(show_spinner=False)
+# @st.cache_data(show_spinner=False)
 def get_activity_data(access_token):
     """
     Get request for Strava user activity data 
