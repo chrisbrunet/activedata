@@ -5,5 +5,4 @@ requests
 seaborn
 polyline
 streamlit-geolocation
-pymongo
 datetime
