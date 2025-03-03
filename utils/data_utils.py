@@ -2,7 +2,7 @@ import streamlit as st
 import pandas as pd
 import requests
 import polyline
-import pymongo
+import os
 import matplotlib.pyplot as plt
 import seaborn as sns
 from utils.data_mappings import column_rename_map
@@ -19,7 +19,7 @@ def get_activity_data(access_token):
         all_activities_df: DataFrame
     """
 
-    print("\nGetting Activity Data...")
+    os.write(1, "\nGetting Activity Data...".encode())
     activities_url = "https://www.strava.com/api/v3/athlete/activities"
     header = {'Authorization': 'Bearer ' + access_token}
     request_page_num = 1
@@ -34,11 +34,11 @@ def get_activity_data(access_token):
             break
         all_activities_list.extend(get_activities)
         status_placeholder.write(f'\tActivities: {len(all_activities_list) - len(get_activities) + 1} to {len(all_activities_list)}')
-        print(f'\t- Activities: {len(all_activities_list) - len(get_activities) + 1} to {len(all_activities_list)}')
+        os.write(1, f'\n\t- Activities: {len(all_activities_list) - len(get_activities) + 1} to {len(all_activities_list)}'.encode())
         request_page_num += 1
     
     status_placeholder.empty() 
-    print("Finished Getting Data")
+    os.write(1, "\nFinished Getting Data".encode())
     all_activities_df = pd.DataFrame(all_activities_list)
     return all_activities_df
 

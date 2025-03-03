@@ -1,6 +1,7 @@
 import urllib
 import urllib3
 import requests
+import os
 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
@@ -47,7 +48,7 @@ def request_access_token(client_id, client_secret, auth_code):
         'grant_type': 'authorization_code',
         'f': 'json'
     }
-    print("\nRequesting Access Token...")
+    os.write(1, "\nRequesting Access Token...".encode())
     res = requests.post(auth_url, data=payload, verify=False)
     access_token = res.json()
     return access_token

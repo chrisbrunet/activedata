@@ -2,6 +2,7 @@ import streamlit as st
 import utils.auth as auth
 import base64
 import datetime
+import os
 
 if "refresh_token" not in st.session_state:
     st.session_state.auth_code = None
@@ -38,12 +39,12 @@ except:
     st.session_state.auth_code = None
 
 if st.session_state.auth_code is not None:
-    print("\n***** NEW LOGIN *****")
+    os.write(1, f"\n***** NEW LOGIN *****".encode())
     now = datetime.datetime.now()
-    print(f"Current time: {now}")
-    print(f"auth_code: {st.session_state.auth_code}")
+    os.write(1, f"\nCurrent time: {now}".encode())
+    os.write(1, f"\nauth_code: {st.session_state.auth_code}".encode())
     st.session_state.access_token = auth.request_access_token(client_id, client_secret, st.session_state.auth_code)
-    print(f"access_token: {st.session_state.access_token}")
+    os.write(1, f"\naccess_token: {st.session_state.access_token}".encode())
 
     if st.session_state.access_token is not None:
             try: 
