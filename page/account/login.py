@@ -39,7 +39,7 @@ except:
     st.session_state.auth_code = None
 
 if st.session_state.auth_code is not None:
-    os.write(1, f"\n***** NEW LOGIN *****".encode())
+    os.write(1, f"\n\n***** NEW LOGIN *****".encode())
     now = datetime.datetime.now()
     os.write(1, f"\nCurrent time: {now}".encode())
     os.write(1, f"\nauth_code: {st.session_state.auth_code}".encode())
