@@ -15,9 +15,9 @@ def get_base64_image(image_path):
 
 image_base64 = get_base64_image("assets/btn_strava_connectwith_orange@2x.png")
 
-client_id = st.secrets.CLIENT_ID
-client_secret = st.secrets.CLIENT_SECRET
-app_url = st.secrets.APP_URL
+client_id = st.secrets["CLIENT_ID"]
+client_secret = st.secrets["CLIENT_SECRET"]
+app_url = st.secrets["APP_URL"]
 
 auth_url = auth.get_authorization_url(app_url, client_id)
 

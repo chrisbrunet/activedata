@@ -1,6 +1,5 @@
 import streamlit as st
 import pydeck as pdk
-import pandas as pd
 from utils import data_utils as dutil
 from streamlit_geolocation import streamlit_geolocation
 
