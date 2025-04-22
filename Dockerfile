@@ -11,6 +11,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 RUN git clone https://github.com/chrisbrunet/activedata.git .
 
+COPY .streamlit/secrets.toml /app/.streamlit/secrets.toml
+
 RUN pip install -r requirements.txt
 
 EXPOSE 8501
