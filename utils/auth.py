@@ -52,3 +52,28 @@ def request_access_token(client_id, client_secret, auth_code):
     res = requests.post(auth_url, data=payload, verify=False)
     access_token = res.json()
     return access_token
+
+def refresh_access_token(client_id, client_secret, refresh_token):
+    """
+    Post request to refresh and get new API access token
+
+    Parameters:
+        client_id: String
+        client_secret: String
+        refresh_token: String
+    
+    Returns:
+        access_token: Dict
+    """
+    auth_url = "https://www.strava.com/oauth/token"
+    payload = {
+        'client_id': client_id,
+        'client_secret': client_secret,
+        'grant_type': 'refresh_token',
+        'refresh_token': refresh_token,
+        'f': 'json'
+    }
+    os.write(1, "\nRefreshing Access Token...".encode())
+    res = requests.post(auth_url, data=payload, verify=False)
+    access_token = res.json()
+    return access_token

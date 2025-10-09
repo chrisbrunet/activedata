@@ -8,6 +8,23 @@ import seaborn as sns
 from utils.data_mappings import column_rename_map
 
 # @st.cache_data(show_spinner=False)
+def get_athlete(access_token):
+    """
+    Get request for athlete stats
+
+    Parameters:
+        access_token: string
+    
+    Returns:
+        athlete: Dict
+    """
+    auth_url = "https://www.strava.com/api/v3/athlete"
+    header = {'Authorization': 'Bearer ' + access_token}
+    os.write(1, "\nGetting Athlete...".encode())
+    res = requests.get(auth_url, headers=header, verify=False)
+    athlete = res.json()
+    return athlete
+
 def get_activity_data(access_token):
     """
     Get request for Strava user activity data 

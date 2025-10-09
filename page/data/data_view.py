@@ -10,10 +10,11 @@ if 'media_data' not in st.session_state:
 
 def logout():
     st.session_state.logged_in = False
-    st.session_state.refresh_token = None
     st.session_state.access_token = None
 
-athlete_id = st.session_state.access_token['athlete']['id']
+access_token = st.session_state.access_token['access_token']
+athlete = dutil.get_athlete(access_token)
+athlete_id = athlete['id']
 athlete_link = f'https://www.strava.com/athletes/{athlete_id}'
 
 if st.session_state.data is None:
@@ -28,9 +29,9 @@ if not st.session_state.data.empty:
     with st.sidebar:
 
         col11, col12 = st.columns(2)
-        firstname = st.session_state.access_token['athlete']['firstname']
-        lastname = st.session_state.access_token['athlete']['lastname']
-        profile_photo = st.session_state.access_token['athlete']['profile']
+        firstname = athlete['firstname']
+        lastname = athlete['lastname']
+        profile_photo = athlete['profile']
 
         with col11:
             st.header(f"{firstname} {lastname}")
