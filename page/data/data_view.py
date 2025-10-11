@@ -9,11 +9,13 @@ if 'media_data' not in st.session_state:
     st.session_state.media_data = None
 
 def logout():
+    print('Logging out...')
     st.session_state.logged_in = False
+    st.session_state.logged_out = True
     st.session_state.access_token = None
 
 access_token = st.session_state.access_token['access_token']
-athlete = dutil.get_athlete(access_token)
+athlete = st.session_state.athlete
 athlete_id = athlete['id']
 athlete_link = f'https://www.strava.com/athletes/{athlete_id}'
 

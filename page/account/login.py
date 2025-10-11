@@ -34,16 +34,16 @@ except:
     st.session_state.auth_code = None
 
 if st.session_state.auth_code is not None:
-    os.write(1, f"\n\n***** NEW LOGIN *****".encode())
+    print(f"\n\n***** NEW LOGIN *****")
     now = datetime.datetime.now()
-    os.write(1, f"\nCurrent time: {now}".encode())
-    os.write(1, f"\nauth_code: {st.session_state.auth_code}".encode())
+    print(f"\nCurrent time: {now}")
+    print(f"\nauth_code: {st.session_state.auth_code}")
     st.session_state.access_token = auth.request_access_token(client_id, client_secret, st.session_state.auth_code)
-    os.write(1, f"\naccess_token: {st.session_state.access_token}".encode())
+    print(f"\naccess_token: {st.session_state.access_token}")
 
     if st.session_state.access_token is not None:
             try: 
-                athlete_id = st.session_state.access_token['athlete']['id']
+                st.session_state.athlete = st.session_state.access_token['athlete']
             except:
                 st.warning("Something went wrong! This happens from time to time. Try refreshing the page and logging in again.")
             else:

@@ -15,26 +15,32 @@ except BaseException as e:
 
 if "logged_in" not in st.session_state:
     st.session_state.logged_in = False
+if "logged_out" not in st.session_state:
+    st.session_state.logged_out = False
 if "access_token" not in st.session_state:
     st.session_state.access_token = None
+if "athlete" not in st.session_state:
+    st.session_state.athlete = None
+
+if st.session_state.logged_out:
+    controller.remove('access_token')
+    st.session_state.logged_out = False
 
 try:
-    token = controller.get('access_token')
-    refresh_token = token['refresh_token']
-    expiry_date = token['expires_at']
+    access_token_cookie = controller.get('access_token')
+    refresh_token = access_token_cookie['refresh_token']
+    expiry_date = access_token_cookie['expires_at']
     datetime_expiry_date = datetime.datetime.fromtimestamp(expiry_date)
-    print('\n\nPrevious Access Token Found')
-    print(refresh_token)
-    print(datetime_expiry_date)
+    print('\nPrevious Access Token Found')
     if datetime_expiry_date > datetime.datetime.now():
         print('Logging in with Refresh Token...')
         client_id = st.secrets["CLIENT_ID"]
         client_secret = st.secrets["CLIENT_SECRET"]
         st.session_state.access_token = auth.refresh_access_token(client_id, client_secret, refresh_token) 
         if st.session_state.access_token is not None:
-            athlete = dutil.get_athlete(st.session_state.access_token['access_token'])
+            st.session_state.athlete = dutil.get_athlete(st.session_state.access_token['access_token'])
             try:
-                athlete_id = athlete['id']
+                athlete_id = st.session_state.athlete['id']
             except:
                 st.warning("Something went wrong! This happens from time to time. Try refreshing the page and logging in again.")
             else:
