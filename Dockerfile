@@ -2,10 +2,10 @@ FROM python:3.12-slim
 
 WORKDIR /app
 
+# Removed software-properties-common from this command
 RUN apt-get update && apt-get install -y --no-install-recommends \
     build-essential \
     curl \
-    software-properties-common \
     git \
     && rm -rf /var/lib/apt/lists/*
 
