@@ -1,23 +1,7 @@
 import streamlit as st
-import pandas as pd
 import pydeck as pdk
 from utils import data_utils as dutil
 from streamlit_geolocation import streamlit_geolocation
-
-@st.cache_data
-def cached_get_activity_data(access_code):
-    print("Fetching and caching raw activity data...")
-    return dutil.get_activity_data(access_code)
-
-@st.cache_data
-def cached_format_data(raw_data):
-    print("Formatting and caching data...")
-    return dutil.format_data(raw_data)
-
-@st.cache_data
-def cached_get_polylines(_df: pd.DataFrame):
-    print(f"Generating and caching polylines for {len(_df)} activities...")
-    return dutil.get_polylines(_df)
 
 if 'data' not in st.session_state:
     st.session_state.data = None
@@ -29,7 +13,6 @@ def logout():
     st.session_state.logged_in = False
     st.session_state.logged_out = True
     st.session_state.access_token = None
-    st.cache_data.clear()
 
 access_token = st.session_state.access_token['access_token']
 athlete = st.session_state.athlete
@@ -39,10 +22,10 @@ athlete_link = f'https://www.strava.com/athletes/{athlete_id}'
 if st.session_state.data is None:
     with st.spinner("Getting Data..."):
         access_code = st.session_state.access_token['access_token']
-        st.session_state.data = cached_get_activity_data(access_code)
+        st.session_state.data = dutil.get_activity_data(access_code)
 
 if not st.session_state.data.empty:
-    formatted_data = cached_format_data(st.session_state.data)
+    formatted_data = dutil.format_data(st.session_state.data)
 
     # PROFILE & FILTERS SIDEBAR
     with st.sidebar:
@@ -156,7 +139,7 @@ if not st.session_state.data.empty:
     # MAP
     with st.expander("Map"):
 
-        polylines = cached_get_polylines(filtered_df)
+        polylines = dutil.get_polylines(filtered_df)
 
         if polylines is not None:
             st.write("Click to use current location:")
