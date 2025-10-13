@@ -43,7 +43,7 @@ def get_activity_data(access_token):
 
     status_placeholder = st.empty()
     
-    while request_page_num < 2: # since max 200 activities can be accessed per request, while loop runs until all activities are loaded
+    while True: # since max 200 activities can be accessed per request, while loop runs until all activities are loaded
         param = {'per_page': 200, 'page': request_page_num}
         get_activities = requests.get(activities_url, headers=header,params=param).json()
         if len(get_activities) == 0: # exit condition
@@ -98,14 +98,15 @@ def get_polylines(df):
     Returns:
         polylines_transformed: DataFrame
     """
+    print('Getting polylines...')
     rows = []
     for index, row in df.iterrows():
-        map_data = pd.DataFrame([row['Map']])
+        map_data = pd.DataFrame([row['map']])
         polylines = map_data["summary_polyline"].values
         coordinates = polyline.decode(polylines[0])
-        activity_name = row["Name"]
-        distance = round(row["Distance (km)"])
-        elevation = round(row["Elevation Gain (m)"])
+        activity_name = row["name"]
+        distance = round(row["distance"])
+        elevation = round(row["total_elevation_gain"])
         description = f"{activity_name}\n{distance} km\n{elevation} m"
         for coord in coordinates:
             rows.append({

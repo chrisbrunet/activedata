@@ -5,8 +5,8 @@ from streamlit_geolocation import streamlit_geolocation
 
 if 'data' not in st.session_state:
     st.session_state.data = None
-if 'media_data' not in st.session_state:
-    st.session_state.media_data = None
+if 'polylines' not in st.session_state:
+    st.session_state.polylines = None
 
 def logout():
     print('Logging out...')
@@ -23,6 +23,7 @@ if st.session_state.data is None:
     with st.spinner("Getting Data..."):
         access_code = st.session_state.access_token['access_token']
         st.session_state.data = dutil.get_activity_data(access_code)
+        st.session_state.polylines = dutil.get_polylines(st.session_state.data)
 
 if not st.session_state.data.empty:
     formatted_data = dutil.format_data(st.session_state.data)
@@ -139,15 +140,16 @@ if not st.session_state.data.empty:
     # MAP
     with st.expander("Map"):
 
-        polylines = dutil.get_polylines(filtered_df)
+        id_list = filtered_df['Map'].apply(lambda x: x['id']).tolist()
+        filtered_polylines = st.session_state.polylines[st.session_state.polylines['name'].isin(id_list)]
 
-        if polylines is not None:
+        if filtered_polylines is not None:
             st.write("Click to use current location:")
             location = streamlit_geolocation()
 
             line_layer = pdk.Layer(
                 "LineLayer",
-                data=polylines,
+                data=filtered_polylines,
                 get_source_position="start",
                 get_target_position="end",
                 get_width=1, 
