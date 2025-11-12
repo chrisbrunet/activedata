@@ -105,7 +105,7 @@ def get_polylines(df):
         polylines = map_data["summary_polyline"].values
         coordinates = polyline.decode(polylines[0])
         activity_name = row["name"]
-        distance = round(row["distance"])
+        distance = round(row["distance"] / 1000, 1)
         elevation = round(row["total_elevation_gain"])
         description = f"{activity_name}\n{distance} km\n{elevation} m"
         for coord in coordinates:
