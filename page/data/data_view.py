@@ -147,15 +147,16 @@ if not st.session_state.data.empty:
             st.write("Click to use current location:")
             location = streamlit_geolocation()
 
-            line_layer = pdk.Layer(
-                "LineLayer",
+            path_layer = pdk.Layer(
+                "PathLayer",
                 data=filtered_polylines,
-                get_source_position="start",
-                get_target_position="end",
-                get_width=1, 
-                get_color=[255, 0, 0], 
+                get_path="path",
+                get_width=5,
+                # width_scale=10,
+                width_min_pixels=1,
+                get_color=[255, 0, 0],
                 highlight_color=[255, 255, 0],
-                picking_radius=10,
+                picking_radius=15,
                 auto_highlight=True,
                 pickable=True,
             )
@@ -169,7 +170,7 @@ if not st.session_state.data.empty:
                     latitude=location["latitude"], longitude=location["longitude"], controller=True, zoom=9,
                 )
 
-            chart = pdk.Deck(layers=line_layer, initial_view_state=view_state, map_style="light", tooltip={'text': '{description}'})
+            chart = pdk.Deck(layers=path_layer, initial_view_state=view_state, map_style="light", tooltip={'text': '{description}'})
             event = st.pydeck_chart(chart)
         else:
             st.write("No Map Data For This Activity :(")  

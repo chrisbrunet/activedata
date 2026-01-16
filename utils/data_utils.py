@@ -105,53 +105,37 @@ def format_data(df):
 
 def get_polylines(df):
     """
-    Decodes polylines and formats into DataFrame usable with PyDeck
+    Decodes polylines and formats into DataFrame usable with PyDeck PathLayer
 
     Parameters:
         df: DataFrame
     
     Returns:
-        polylines_transformed: DataFrame
+        polylines_df: DataFrame with 'name', 'description', 'path'
     """
     print('Getting polylines...')
     rows = []
     for index, row in df.iterrows():
         map_data = pd.DataFrame([row['map']])
         polylines = map_data["summary_polyline"].values
+        if pd.isna(polylines[0]) or polylines[0] == '':
+            continue  # Skip if no polyline
         coordinates = polyline.decode(polylines[0])
         activity_name = row["name"]
         distance = round(row["distance"] / 1000, 1)
         elevation = round(row["total_elevation_gain"])
         description = f"{activity_name}\n{distance} km\n{elevation} m"
-        for coord in coordinates:
-            rows.append({
-                "description": description,
-                "name": map_data["id"].values, 
-                "latitude": coord[0], 
-                "longitude": coord[1]
-                })
+        
+        # Path as list of [lon, lat]
+        path = [[coord[1], coord[0]] for coord in coordinates] 
+        rows.append({
+            "name": map_data["id"].values[0],
+            "description": description,
+            "path": path
+        })
 
     polylines_df = pd.DataFrame(rows)
-
-    if polylines_df.empty:
-        return None
-
-    else:
-        polylines_df["name"] = polylines_df["name"].apply(lambda x: x[0])
-
-        polylines_transformed = (
-            polylines_df.groupby("name")
-            .apply(
-                lambda group: pd.DataFrame({
-                    "description": group["description"].iloc[:-1],
-                    "name": group["name"].iloc[:-1], 
-                    "start": group[["longitude", "latitude"]].values[:-1].tolist(),
-                    "end": group[["longitude", "latitude"]].values[1:].tolist(), 
-                })
-            )
-            .reset_index(drop=True)
-        )
-        return polylines_transformed
+    return polylines_df if not polylines_df.empty else None
 
 def plot_histogram(df, column_name, bins):
     """
