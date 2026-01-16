@@ -4,9 +4,10 @@ import requests
 import polyline
 import matplotlib.pyplot as plt
 import seaborn as sns
+import concurrent.futures
 from utils.data_mappings import column_rename_map
 
-# @st.cache_data(show_spinner=False)
+@st.cache_data(show_spinner=False)
 def get_athlete(access_token):
     """
     Get request for athlete stats
@@ -24,6 +25,15 @@ def get_athlete(access_token):
     athlete = res.json()
     return athlete
 
+def fetch_page(page_num, activities_url, header):
+    """
+    Fetch a single page of activities
+    """
+    param = {'per_page': 200, 'page': page_num}
+    response = requests.get(activities_url, headers=header, params=param)
+    return response.json()
+
+@st.cache_data(show_spinner=False)
 def get_activity_data(access_token):
     """
     Get request for Strava user activity data 
@@ -34,26 +44,31 @@ def get_activity_data(access_token):
     Returns:
         all_activities_df: DataFrame
     """
-
     print("\nGetting Activity Data...")
     activities_url = "https://www.strava.com/api/v3/athlete/activities"
     header = {'Authorization': 'Bearer ' + access_token}
-    request_page_num = 1
     all_activities_list = []
 
     status_placeholder = st.empty()
-    
-    while True: # since max 200 activities can be accessed per request, while loop runs until all activities are loaded
-        param = {'per_page': 200, 'page': request_page_num}
-        get_activities = requests.get(activities_url, headers=header,params=param).json()
-        if len(get_activities) == 0: # exit condition
-            break
-        all_activities_list.extend(get_activities)
-        status_placeholder.write(f'\tActivities: {len(all_activities_list) - len(get_activities) + 1} to {len(all_activities_list)}')
-        print(f'\n\t- Activities: {len(all_activities_list) - len(get_activities) + 1} to {len(all_activities_list)}')
-        request_page_num += 1
-    
-    status_placeholder.empty() 
+
+    # Fetch up to 10 pages in parallel (assuming max ~2000 activities)
+    max_pages = 10
+    with concurrent.futures.ThreadPoolExecutor(max_workers=5) as executor:
+        futures = [executor.submit(fetch_page, page_num, activities_url, header) for page_num in range(1, max_pages + 1)]
+        for i, future in enumerate(concurrent.futures.as_completed(futures)):
+            result = future.result()
+            if len(result) > 0:
+                all_activities_list.extend(result)
+                status_placeholder.write(f'Fetched {len(all_activities_list)} activities so far...')
+                print(f'\n\t- Fetched page {i+1}, total activities: {len(all_activities_list)}')
+            else:
+                # If a page is empty, we can stop, but since concurrent, we continue
+                pass
+
+    # Sort activities by start_date_local descending (most recent first)
+    all_activities_list.sort(key=lambda x: x.get('start_date_local', ''), reverse=True)
+
+    status_placeholder.empty()
     print("\nFinished Getting Data")
     all_activities_df = pd.DataFrame(all_activities_list)
     return all_activities_df
