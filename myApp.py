@@ -26,6 +26,7 @@ if st.session_state.logged_out:
     controller.remove('access_token')
     st.session_state.logged_out = False
 
+# Check for existing access token cookie and refresh if valid
 try:
     access_token_cookie = controller.get('access_token')
     refresh_token = access_token_cookie['refresh_token']
@@ -41,11 +42,12 @@ try:
             st.session_state.athlete = dutil.get_athlete(st.session_state.access_token['access_token'])
             try:
                 athlete_id = st.session_state.athlete['id']
+                st.session_state.logged_in = True
+                print('Successfully logged in with refresh token')
             except:
                 st.warning("Something went wrong! This happens from time to time. Try refreshing the page and logging in again.")
-            else:
-                st.session_state.logged_in = True
-                st.rerun()
+        else:
+            print('Failed to refresh token')
     else:
         print('Refresh Code Expired')
 except:
