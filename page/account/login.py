@@ -2,7 +2,6 @@ import streamlit as st
 import utils.auth as auth
 import base64
 import datetime
-import os
 
 def get_base64_image(image_path):
     with open(image_path, "rb") as img_file:
