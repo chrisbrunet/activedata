@@ -7,6 +7,44 @@ import seaborn as sns
 import concurrent.futures
 from utils.data_mappings import column_rename_map
 
+def connect_to_db(client, database_name="activedata", collection_name="signins"):
+    """
+    Connects to a MongoDB database and collection
+    
+    Parameters:
+        client: pymongo MongoClient
+        database_name: string
+        collection_name: string 
+    Returns:
+        collection: pymongo Collection
+    """
+    try:
+        db = client.get_database(database_name)
+        collection = db.get_collection(collection_name)
+        print(f"\nConnected to {db.name} database.")
+    except Exception as e:
+        print(f"\nError connecting to database: {e}")
+        collection = None
+
+    return collection
+
+def add_to_db(collection, data):
+    """
+    Adds a document to the specified MongoDB collection
+
+    Parameters:
+        collection: pymongo Collection
+        data: Dict
+    
+    Returns:
+        result: InsertOneResult
+    """
+    try:
+        result = collection.insert_one(data)
+        print(f"\nDocument inserted with id: {result.inserted_id}")
+    except Exception as e:
+        print(f"\nError inserting document: {e}")
+
 @st.cache_data(show_spinner=False)
 def get_athlete(access_token):
     """
