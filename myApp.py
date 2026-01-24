@@ -11,15 +11,17 @@ if "access_token" not in st.session_state:
     st.session_state.access_token = None
 if "athlete" not in st.session_state:
     st.session_state.athlete = None
+if 'all_data_page' not in st.session_state:
+    st.session_state.all_data_page = None
 
 login = st.Page("page/account/login.py", title="Log In", icon=":material/login:")
-allData = st.Page("page/data/data_view.py", title="All Data", icon=":material/analytics:", default=True)
+st.session_state.all_data_page = st.Page("page/data/data_view.py", title="All Data", icon=":material/analytics:", default=True)
 
 if st.session_state.logged_in:
     
     pg = st.navigation(
             {
-                "Data": [allData],
+                "Data": [st.session_state.all_data_page],
             }
         )
 else:

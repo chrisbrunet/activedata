@@ -41,7 +41,7 @@ if st.session_state.auth_code is not None:
                 st.warning("Something went wrong! This happens from time to time. Try refreshing the page and logging in again.")
             else:
                 st.session_state.logged_in = True
-                st.rerun()
+                st.switch_page(st.session_state.all_data_page)
 
 st.container(height=200, border=False)
 st.image("assets/api_logo_pwrdBy_strava_stack_light.png", width=130)
