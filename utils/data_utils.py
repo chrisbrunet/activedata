@@ -1,3 +1,4 @@
+import base64
 import streamlit as st
 import pandas as pd
 import requests
@@ -193,3 +194,7 @@ def plot_histogram(df, column_name, bins):
     plt.ylabel("")
     plt.gca().axes.get_yaxis().set_visible(False)
     st.pyplot(plt.gcf()) 
+
+def get_base64_image(image_path):
+    with open(image_path, "rb") as img_file:
+        return base64.b64encode(img_file.read()).decode()

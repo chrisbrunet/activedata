@@ -7,21 +7,16 @@ except BaseException as e:
 
 if "logged_in" not in st.session_state:
     st.session_state.logged_in = False
-if "logged_out" not in st.session_state:
-    st.session_state.logged_out = False
 if "access_token" not in st.session_state:
     st.session_state.access_token = None
 if "athlete" not in st.session_state:
     st.session_state.athlete = None
 
 login = st.Page("page/account/login.py", title="Log In", icon=":material/login:")
+allData = st.Page("page/data/data_view.py", title="All Data", icon=":material/analytics:", default=True)
 
-# setting up page navigation
 if st.session_state.logged_in:
     
-    # linking pages to .py files
-    allData = st.Page("page/data/data_view.py", title="All Data", icon=":material/analytics:", default=True)
-
     pg = st.navigation(
             {
                 "Data": [allData],

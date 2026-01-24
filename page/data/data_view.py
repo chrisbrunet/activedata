@@ -5,17 +5,6 @@ import pydeck as pdk
 from utils import data_utils as dutil
 from streamlit_geolocation import streamlit_geolocation
 
-CONNECTION_STRING = st.secrets["MONGODB_CONNECTION_STRING"]
-client = pymongo.MongoClient(CONNECTION_STRING)
-signins_collection = dutil.connect_to_db(client, collection_name="signins")
-
-now = datetime.datetime.now()
-login_details = st.session_state.athlete.copy()
-login_details['login_time'] = now
-login_details['athlete_id'] = login_details.pop('id')
-
-dutil.add_to_db(signins_collection, login_details)
-
 if 'data' not in st.session_state:
     st.session_state.data = None
 if 'polylines' not in st.session_state:
@@ -24,7 +13,6 @@ if 'polylines' not in st.session_state:
 def logout():
     print('Logging out...')
     st.session_state.logged_in = False
-    st.session_state.logged_out = True
     st.session_state.access_token = None
 
 access_token = st.session_state.access_token['access_token']
@@ -37,6 +25,17 @@ if st.session_state.data is None:
         access_code = st.session_state.access_token['access_token']
         st.session_state.data = dutil.get_activity_data(access_code)
         st.session_state.polylines = dutil.get_polylines(st.session_state.data)
+
+        CONNECTION_STRING = st.secrets["MONGODB_CONNECTION_STRING"]
+        client = pymongo.MongoClient(CONNECTION_STRING)
+        signins_collection = dutil.connect_to_db(client, collection_name="signins")
+
+        now = datetime.datetime.now()
+        login_details = st.session_state.athlete.copy()
+        login_details['login_time'] = now
+        login_details['athlete_id'] = login_details.pop('id')
+
+        dutil.add_to_db(signins_collection, login_details)
 
 if not st.session_state.data.empty:
     formatted_data = dutil.format_data(st.session_state.data)
@@ -91,6 +90,15 @@ if not st.session_state.data.empty:
 
         with col4:
             st.image("assets/api_logo_pwrdBy_strava_stack_light.png", use_container_width="always")
+
+        github_logo = dutil.get_base64_image("assets/github_logo.png")
+        github_html = f"""
+        Made by Chris Brunet&nbsp;&nbsp;
+        <a href="https://github.com/chrisbrunet/ActiveData">
+            <img src="data:image/png;base64,{github_logo}" width="40">
+        </a>
+        """
+        st.markdown(github_html, unsafe_allow_html=True)
 
     # TOTALS CONTAINER
     with st.container(border=True):
