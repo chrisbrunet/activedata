@@ -1,14 +1,6 @@
 import streamlit as st
 import utils.auth as auth
-import utils.data_utils as data_utils
 import base64
-import datetime
-import pymongo
-
-CONNECTION_STRING = st.secrets["MONGODB_CONNECTION_STRING"]
-client = pymongo.MongoClient(CONNECTION_STRING)
-
-signins_collection = data_utils.connect_to_db(client, collection_name="signins")
 
 def get_base64_image(image_path):
     with open(image_path, "rb") as img_file:
@@ -41,8 +33,6 @@ except:
 
 if st.session_state.auth_code is not None:
     print(f"\n\n***** NEW LOGIN *****")
-    now = datetime.datetime.now()
-    print(f"\nCurrent time: {now}")
     print(f"\nauth_code: {st.session_state.auth_code}")
     st.session_state.access_token = auth.request_access_token(client_id, client_secret, st.session_state.auth_code)
     print(f"\naccess_token: {st.session_state.access_token}")
@@ -53,11 +43,6 @@ if st.session_state.auth_code is not None:
             except:
                 st.warning("Something went wrong! This happens from time to time. Try refreshing the page and logging in again.")
             else:
-                login_details = st.session_state.athlete.copy()
-                login_details['login_time'] = now
-                login_details['athlete_id'] = login_details.pop('id')
-
-                data_utils.add_to_db(signins_collection, login_details)
                 st.session_state.logged_in = True
                 st.rerun()
 

@@ -1,7 +1,20 @@
 import streamlit as st
+import pymongo
+import datetime
 import pydeck as pdk
 from utils import data_utils as dutil
 from streamlit_geolocation import streamlit_geolocation
+
+CONNECTION_STRING = st.secrets["MONGODB_CONNECTION_STRING"]
+client = pymongo.MongoClient(CONNECTION_STRING)
+signins_collection = dutil.connect_to_db(client, collection_name="signins")
+
+now = datetime.datetime.now()
+login_details = st.session_state.athlete.copy()
+login_details['login_time'] = now
+login_details['athlete_id'] = login_details.pop('id')
+
+dutil.add_to_db(signins_collection, login_details)
 
 if 'data' not in st.session_state:
     st.session_state.data = None
