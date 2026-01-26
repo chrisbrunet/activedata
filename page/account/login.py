@@ -3,7 +3,6 @@ import utils.auth as auth
 import utils.data_utils as dutil
 
 strava_login_button = dutil.get_base64_image("assets/btn_strava_connectwith_orange@2x.png")
-github_logo = dutil.get_base64_image("assets/github_logo.png")
 
 client_id = st.secrets["CLIENT_ID"]
 client_secret = st.secrets["CLIENT_SECRET"]
@@ -47,9 +46,6 @@ st.container(height=200, border=False)
 st.image("assets/api_logo_pwrdBy_strava_stack_light.png", width=130)
 
 github_html = f"""
-Made by Chris Brunet&nbsp;&nbsp;
-<a href="https://github.com/chrisbrunet/ActiveData">
-     <img src="data:image/png;base64,{github_logo}" width="40">
-</a>
+[![Created by chrisbrunet](https://img.shields.io/badge/Created_by-chrisbrunet-a1abb3?logo=github)](https://github.com/chrisbrunet/ActiveData)
 """
 st.markdown(github_html, unsafe_allow_html=True)

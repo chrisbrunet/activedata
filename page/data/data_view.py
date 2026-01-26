@@ -91,12 +91,8 @@ if not st.session_state.data.empty:
         with col4:
             st.image("assets/api_logo_pwrdBy_strava_stack_light.png", use_container_width="always")
 
-        github_logo = dutil.get_base64_image("assets/github_logo.png")
         github_html = f"""
-        Made by Chris Brunet&nbsp;&nbsp;
-        <a href="https://github.com/chrisbrunet/ActiveData">
-            <img src="data:image/png;base64,{github_logo}" width="40">
-        </a>
+        [![Created by chrisbrunet](https://img.shields.io/badge/Created_by-chrisbrunet-a1abb3?logo=github)](https://github.com/chrisbrunet/ActiveData)
         """
         st.markdown(github_html, unsafe_allow_html=True)
 
