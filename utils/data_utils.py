@@ -112,6 +112,7 @@ def get_activity_data(access_token):
     all_activities_df = pd.DataFrame(all_activities_list)
     return all_activities_df
 
+@st.cache_data(show_spinner=False)
 def format_data(df):
     """
     Formats activity data into clean standardized form 
@@ -176,6 +177,7 @@ def get_polylines(df):
     polylines_df = pd.DataFrame(rows)
     return polylines_df if not polylines_df.empty else None
 
+@st.cache_data(show_spinner=False)
 def plot_histogram(df, column_name, bins):
     """
     Plots user activity stats in a histogram 
@@ -195,6 +197,7 @@ def plot_histogram(df, column_name, bins):
     plt.gca().axes.get_yaxis().set_visible(False)
     st.pyplot(plt.gcf())
 
+@st.cache_data(show_spinner=False)
 def plot_calendar_heatmap(df, year):
     """
     Plots a calendar heatmap of activities over time
