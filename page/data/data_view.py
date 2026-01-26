@@ -156,6 +156,10 @@ if not st.session_state.data.empty:
             with col3: 
                 dutil.plot_histogram(filtered_df, "Average Speed (km/h)", bins)
             
+            selectbox_years = sorted({d.year for d in filtered_df['Start Date'].unique()}, reverse=True)
+            selected_year = st.selectbox("Select Year for Calendar Heatmap", selectbox_years)
+            dutil.plot_calendar_heatmap(filtered_df, selected_year)
+
     # MAP
     with st.expander("Map"):
 

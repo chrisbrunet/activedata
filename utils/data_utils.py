@@ -193,6 +193,54 @@ def plot_histogram(df, column_name, bins):
     plt.xlabel(column_name)
     plt.ylabel("")
     plt.gca().axes.get_yaxis().set_visible(False)
+    st.pyplot(plt.gcf())
+
+def plot_calendar_heatmap(df, year):
+    """
+    Plots a calendar heatmap of activities over time
+
+    Parameters:
+        df: DataFrame
+        year: int
+    
+    Returns:
+        none
+    """
+    # Group by date and sum distances
+    df['Start Date'] = pd.to_datetime(df['Start Date'])
+    activity_counts = df.groupby(df['Start Date'].dt.date)['Distance (km)'].sum().reset_index(name='Total Distance')
+    
+    # Create full date range for the year
+    start_date = pd.Timestamp(year, 1, 1)
+    end_date = pd.Timestamp(year, 12, 31)
+    full_dates = pd.date_range(start_date, end_date, freq='D')
+    full_df = pd.DataFrame({'Start Date': full_dates, 'Total Distance': 0.0})
+    full_df['Start Date'] = full_df['Start Date'].dt.date
+    
+    # Merge with actual sums
+    merged = pd.merge(full_df, activity_counts, on='Start Date', how='left', suffixes=('', '_actual'))
+    merged['Total Distance'] = merged['Total Distance_actual'].fillna(0.0)
+    merged = merged[['Start Date', 'Total Distance']]
+    
+    # Create pivot table for heatmap
+    merged['Start Date'] = pd.to_datetime(merged['Start Date'])
+    merged['Year'] = merged['Start Date'].dt.year
+    merged['Month'] = merged['Start Date'].dt.month
+    merged['Day'] = merged['Start Date'].dt.day
+    
+    pivot_table = merged.pivot_table(index='Month', columns='Day', values='Total Distance', aggfunc='sum', fill_value=0)
+    
+    plt.figure(figsize=(12, 4))
+    sns.heatmap(
+        pivot_table, 
+        cmap="Oranges", 
+        linewidths=5, 
+        annot=False, 
+        cbar=True, 
+        cbar_kws={'label': 'Total Distance (km)'},
+        yticklabels=[ 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'])
+    plt.xlabel("")
+    plt.ylabel("")
     st.pyplot(plt.gcf()) 
 
 def get_base64_image(image_path):
