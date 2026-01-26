@@ -15,6 +15,8 @@ def logout():
     st.session_state.logged_in = False
     st.session_state.access_token = None
 
+st.image("assets/logo.png", width=250)
+
 access_token = st.session_state.access_token['access_token']
 athlete = st.session_state.athlete
 athlete_id = athlete['id']
@@ -153,7 +155,7 @@ if not st.session_state.data.empty:
 
             with col3: 
                 dutil.plot_histogram(filtered_df, "Average Speed (km/h)", bins)
-
+            
     # MAP
     with st.expander("Map"):
 
