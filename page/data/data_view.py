@@ -203,4 +203,9 @@ if not st.session_state.data.empty:
         display_data = filtered_df
         columns_to_drop = ['Activity ID', 'Map', 'Photos']
         display_data = display_data.drop(columns=columns_to_drop)
-        st.write(display_data)
+        st.dataframe(
+            display_data,
+            column_config={
+                "Activity Link": st.column_config.LinkColumn()
+            }
+        )

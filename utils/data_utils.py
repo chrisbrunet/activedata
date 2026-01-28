@@ -141,6 +141,8 @@ def format_data(df):
     df['Max Speed (km/h)'] = df['Max Speed (km/h)'] * 3.6
     df['Start Date'] = pd.to_datetime(df['Start Date']).dt.date
 
+    df['Activity Link'] = "https://www.strava.com/activities/" + df['Activity ID'].astype(str)
+
     return df
 
 def get_polylines(df):
