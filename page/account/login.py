@@ -10,21 +10,6 @@ app_url = st.secrets["APP_URL"]
     
 auth_url = auth.get_authorization_url(app_url, client_id)
 
-st.image("assets/logo.png", width=250)
-
-st.write("""
-         This web app can connect to your Strava account and display your activity data through various visualizations. 
-         
-         To use this app, please authorize Strava access by clicking the button below:
-         """)
-
-strava_html = f"""
-<a href="{auth_url}">
-    <img src="data:image/png;base64,{strava_login_button}" width="200">
-</a>
-"""
-st.markdown(strava_html, unsafe_allow_html=True)
-
 try:
     st.session_state.auth_code = st.query_params.code
     st.query_params.clear()
@@ -44,7 +29,22 @@ if st.session_state.auth_code is not None:
                 st.warning("Something went wrong! This happens from time to time. Try refreshing the page and logging in again.")
             else:
                 st.session_state.logged_in = True
-                st.switch_page(st.session_state.all_data_page)
+                st.rerun()
+
+st.image("assets/logo.png", width=250)
+
+st.write("""
+         This web app can connect to your Strava account and display your activity data through various visualizations. 
+         
+         To use this app, please authorize Strava access by clicking the button below:
+         """)
+
+strava_html = f"""
+<a href="{auth_url}">
+    <img src="data:image/png;base64,{strava_login_button}" width="200">
+</a>
+"""
+st.markdown(strava_html, unsafe_allow_html=True)
 
 st.container(height=200, border=False)
 st.image("assets/api_logo_pwrdBy_strava_stack_light.png", width=130)
